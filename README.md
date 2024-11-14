@@ -1,6 +1,6 @@
 # Movie Ticket Booking
 
-IT4062 - Network Programming: Multi-threaded client/server application using TCP sockets
+IT4062E - Network Programming - 20241: Movie ticket booking application using TCP sockets
 
 ## Installation
 
