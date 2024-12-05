@@ -3,4 +3,5 @@
 #include "../lib/message.h"
 
 int logIn(int socketfd, char *uname);
+int signup(int socketfd);
 #endif

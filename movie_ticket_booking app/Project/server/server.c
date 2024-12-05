@@ -20,6 +20,10 @@ int socketfd;
 order ticket;
 int child_process_running = 1;
 
+// new 
+char buf[MAXLINE];
+int fieldCount;
+char datafields[][50];
 void initServer()
 {
     struct sockaddr_in servaddr;
@@ -88,31 +92,52 @@ int main(int argc, char **argv)
             close(socketfd);
             while (child_process_running)
             {
-                n = recv(connfd, &state, sizeof(state), 0);
+                //n = recv(connfd, &state, sizeof(state), 0);
+                n = recvStr(connfd, buf);
+                
                 if (n < 0)
                 {
                     perror("Read error");
                     exit(1);
                 }
 
-                if (n == 0)
+                else if (n == 0)
                 {
                     printf("[+]%s:%d - Disconnected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     exit(0);
                 }
-
-                state = ntohl(state);
+                else{
+                    // no error in receiving message
+                    printf("Message sent from address %s:%d: ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    puts(buf);
+                }
+                
+                parse_message(buf, datafields, &fieldCount);
+                char* signal = datafields[0];
+                printf("Signal: %s \n", signal);
+                // state = ntohl(state);
+                state = get_signal_from_string(signal);
                 switch (state)
                 {
                 case LOGIN:
-                    printf("[+]%s:%d - Request login from user ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    logIn(connfd);
+                    char* username = datafields[1];
+                    char* password = datafields[2];
+                    // check if the username and password matches the data in database
+                    // if matches, send success response else send fail response
+                    sendInt(connfd, SUCCESS);
                     printf("[+]%s:%d - Login successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     break;
 
                 case SIGNUP:
+                    // char* username = datafields[1];
+                    // char* password = datafields[2];
+                    sendInt(connfd, SUCCESS);
+                    printf("[+]%s:%d - Sign up new account successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     break;
-
+                case SEARCH:
+                    char* title = datafields[1];
+                    printf("[+]%s:%d - Movie title requested: \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), title);
+                    sendInt(connfd, SEARCHFOUND);
                 case ORDERS:
                     break;
 

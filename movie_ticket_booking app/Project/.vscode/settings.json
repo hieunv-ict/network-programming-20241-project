@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "message.h": "c",
+        "function.h": "c",
+        "booking.h": "c",
+        "movie_function.h": "c"
+    }
+}

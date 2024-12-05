@@ -9,7 +9,7 @@
 #include "../lib/message.h"
 #include "authen.h"
 #include "booking.h"
-
+#include "movie_function.h"
 #define MAXLINE 4096   /*max text line length*/
 #define SERV_PORT 3000 /*port*/
 
@@ -50,10 +50,11 @@ int menuAuthen()
     {
         printf("\n1. Login\n");
         printf("2. Signup\n");
-        printf("3. Exit\n");
+        printf("3. Search movies by name\n");
+        printf("4. Exit\n");
         printf("Please enter your choice: ");
         scanf("%d", &choice);
-    } while (choice < 1 || choice > 3);
+    } while (choice < 1 || choice > 4);
     return choice;
 }
 
@@ -80,11 +81,29 @@ int main(int argc, char **argv)
                 printf("Login fail!\n\n");
 
         } while (re != SUCCESS);
+
         printf("\nLogin successful!\n");
         booking(socketfd, uname);
         break;
     case 2:
+        do
+        {
+            re = signup(socketfd);
+            if (re != SUCCESS)
+                printf("Signup fail!\n\n");
 
+        } while (re != SUCCESS);
+        
+        printf("\nSign up successful!\n");
+        menuAuthen();
+        break;
+
+    case 3:
+        printf("Search movie \n");
+        int response = search_movie_by_title(socketfd);
+        if (response == SEARCHFOUND){
+            printf("Found movie");
+        }
         break;
     default:
         break;

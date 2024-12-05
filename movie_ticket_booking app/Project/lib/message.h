@@ -9,12 +9,15 @@
 #include "pay.h"
 #include "order.h"
 
-enum
+enum state_signal
 {
-    SUCCESS,
-    FAILURE,
     LOGIN,
     SIGNUP,
+    SEARCH,
+    SEARCHFOUND,
+    SEARCHNOTFOUND,
+    SUCCESS,
+    FAILURE,
     BOOKING,
     ORDERS,
     MOVIE,
@@ -24,6 +27,8 @@ enum
     PAY,
     CONFIRM
 };
+
+
 
 #define FARE 50000
 
