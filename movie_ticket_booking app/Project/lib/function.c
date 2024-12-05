@@ -15,7 +15,13 @@ void sendStr(int fd, char *str)
     int len;
     len = htonl(strlen(str));
     send(fd, &len, sizeof(len), 0); // Send len of the string
-    send(fd, str, strlen(str), 0);  // Send the string
+    int n = send(fd, str, strlen(str), 0);  // Send the string
+    
+    if (n < 0){
+        perror("send failed");
+        // Or use strerror
+        //printf("Error: %s\n", strerror(errno));
+    }
 }
 
 int recvStr(int fd, char *str)

@@ -70,44 +70,57 @@ int main(int argc, char **argv)
 
     connectToServer(argv[1]);
 
-    choice = menuAuthen();
-    switch (choice)
-    {
-    case 1:
-        do
+    do{
+        choice = menuAuthen();
+        switch (choice)
         {
-            re = logIn(socketfd, uname);
-            if (re != SUCCESS)
-                printf("Login fail!\n\n");
+        case 1:
+            do
+            {
+                re = logIn(socketfd, uname);
+                if (re == FAILURE)
+                    printf("wRONG PASSWORD!\n\n");
+                else if (re == USERNOTFOUND){
+                    printf("User not found! \n\n");
+                }
 
-        } while (re != SUCCESS);
+            } while (re != SUCCESS);
 
-        printf("\nLogin successful!\n");
-        booking(socketfd, uname);
-        break;
-    case 2:
-        do
-        {
-            re = signup(socketfd);
-            if (re != SUCCESS)
-                printf("Signup fail!\n\n");
+            printf("\nLogin successful!\n");
+            
+            //TODO: add feature after logging in here:
 
-        } while (re != SUCCESS);
-        
-        printf("\nSign up successful!\n");
-        menuAuthen();
-        break;
+            //booking(socketfd, uname);
+            break;
+        case 2:
+            do
+            {
+                re = signup(socketfd);
+                if (re != SUCCESS)
+                    printf("Signup fail!\n\n");
 
-    case 3:
-        printf("Search movie \n");
-        int response = search_movie_by_title(socketfd);
-        if (response == SEARCHFOUND){
-            printf("Found movie");
+            } while (re != SUCCESS);
+            
+            printf("\nSign up successful!\n");
+            
+            break;
+
+        case 3:
+            do
+            {
+                re = search_movie_by_title(socketfd);
+                if (re != SEARCHFOUND)
+                    printf("Cannot found movie\n\n");
+
+            } while (re != SEARCHFOUND);
+            printf("Found movie \n");
+            
+            break;
+        default:
+            break;
         }
-        break;
-    default:
-        break;
-    }
-    // memset(&buffer, 0, sizeof(buffer));
+    }while(choice == 2);
+    
+    
     return 0;
 }

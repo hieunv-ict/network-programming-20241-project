@@ -9,9 +9,10 @@
 #include <signal.h>
 #include "authen.h"
 #include "booking.h"
+#include "movie_func.h"
 #include "../lib/message.h"
 #include "../lib/function.h"
-
+#include "database/database.h"
 #define MAXLINE 4096   /*max text line length*/
 #define SERV_PORT 3000 /*port*/
 #define LISTENQ 8      /*maximum number of client connections */
@@ -19,7 +20,7 @@
 int socketfd;
 order ticket;
 int child_process_running = 1;
-
+sqlite3* app_db;
 // new 
 char buf[MAXLINE];
 int fieldCount;
@@ -76,6 +77,7 @@ int main(int argc, char **argv)
     new_action.sa_flags = 0;
     sigaction(SIGINT, &new_action, &old_action); // Ctrl+C for generating the signal
 
+    app_db = initializeDatabase();
     initServer();
     while (1)
     {
@@ -117,27 +119,51 @@ int main(int argc, char **argv)
                 printf("Signal: %s \n", signal);
                 // state = ntohl(state);
                 state = get_signal_from_string(signal);
+                // open database
+                if (sqlite3_open("users.db", &app_db) != SQLITE_OK) {
+                    fprintf(stderr, "Could not open database: %s\n", sqlite3_errmsg(app_db));
+                    return 1;
+                }
                 switch (state)
                 {
                 case LOGIN:
-                    char* username = datafields[1];
-                    char* password = datafields[2];
                     // check if the username and password matches the data in database
                     // if matches, send success response else send fail response
-                    sendInt(connfd, SUCCESS);
-                    printf("[+]%s:%d - Login successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    int login_reponse = log_in(app_db, connfd, datafields[1], datafields[2]);
+                    if (login_reponse == SUCCESS){
+                        sendInt(connfd, SUCCESS);
+                        printf("[+]%s:%d - Log in successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    }
+                    else if (login_reponse == FAILURE){
+                        sendInt(connfd, FAILURE);
+                        printf("[+]%s:%d - Log in failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    }
+                    else if (login_reponse == USERNOTFOUND){
+                        sendInt(connfd, USERNOTFOUND);
+                        printf("[+]%s:%d - User not found\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    }
                     break;
 
                 case SIGNUP:
-                    // char* username = datafields[1];
-                    // char* password = datafields[2];
-                    sendInt(connfd, SUCCESS);
-                    printf("[+]%s:%d - Sign up new account successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    
+                    int response = sign_up(app_db, connfd, datafields[1], datafields[2]);
+                    if (response == SUCCESS){
+                        sendInt(connfd, SUCCESS);
+                        printf("[+]%s:%d - Sign up new account successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    }
+                    else if (response == FAILURE){
+                        sendInt(connfd, FAILURE);
+                        printf("[+]%s:%d - Sign up new account failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    }
+                    
+                    
                     break;
                 case SEARCH:
                     char* title = datafields[1];
-                    printf("[+]%s:%d - Movie title requested: \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), title);
-                    sendInt(connfd, SEARCHFOUND);
+                    printf("[+]%s:%d - Movie title requested: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), title);
+                    send_movie_list(connfd, title);
+                    
+                    break;
                 case ORDERS:
                     break;
 

@@ -25,7 +25,8 @@ enum state_signal
     TIME,
     SEAT,
     PAY,
-    CONFIRM
+    CONFIRM,
+    USERNOTFOUND
 };
 
 
