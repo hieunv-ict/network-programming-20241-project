@@ -21,7 +21,6 @@ int logIn(int socketfd, char *uname)
     char* datafield[] = {signal, uname, passwd};
     int msg_len = sizeof(datafield) / sizeof(datafield[0]);
     char* message = concatenate_strings(datafield, msg_len);
-    printf("message:%s\n", message);
     
     sendStr(socketfd, message);
     // receive server response

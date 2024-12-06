@@ -279,7 +279,7 @@ void selectMovie()
     {
         printf("Please enter the ID of movie: ");
         scanf("%d", &select);
-        if (valueInArr(select, ticket.movie.id, ticket.movie.num) == 1)
+        if (valueInArr(select, ticket.movie.id, ticket.movie.num))
         {
             printf("ID is invalid !\n");
         }
@@ -292,8 +292,14 @@ void selectMovie()
     ticket.order.movie_id = select;
     strcpy(ticket.order.movie, ticket.movie.name[indx]);
 
-    sendInt(socketfd, ticket.order.movie_id);
-    sendStr(socketfd, ticket.order.movie);
+    char * signal = get_string_from_signal(MOVIE);
+    char* datafield[] = {signal, ticket.order.movie_id};
+    int msg_len = sizeof(datafield) / sizeof(datafield[0]);
+    char* message = concatenate_strings(datafield, msg_len);
+
+    // sendStr(socketfd, message);
+    // sendInt(socketfd, ticket.order.movie_id);
+    // sendStr(socketfd, ticket.order.movie);
 
     receiveCinema();
 }

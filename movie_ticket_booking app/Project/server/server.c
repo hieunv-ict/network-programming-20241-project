@@ -179,7 +179,7 @@ int main(int argc, char **argv)
                     break;
 
                 case MOVIE:
-                    printf("\n[+]%s:%d - Request MOVIE\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    printf("\n[+]%s:%d - Selected MOVIE: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
                     sendListMovies(connfd);
                     ticket.movie_id = recvInt(connfd);
                     recvStr(connfd, ticket.movie);
