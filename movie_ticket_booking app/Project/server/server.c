@@ -167,6 +167,12 @@ int main(int argc, char **argv)
                 case ORDERS:
                     break;
 
+                case BROWSE:
+                    char* category = datafields[1];
+                    printf("[+]%s:%d - Movie category prompted: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), category);
+                    send_browse_list(connfd, category);
+
+                    break;
                 case BOOKING:
                     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     setFd(connfd);

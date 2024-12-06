@@ -40,7 +40,6 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
 }
 
 int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
-    
     sqlite3_stmt *stmt;
     const char *sql = "SELECT password FROM users WHERE username = ?;";
     // Prepare SQL statement

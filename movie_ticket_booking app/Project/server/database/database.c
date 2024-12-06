@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
+#include "sqlite/sqlite3.h"
 #define DB_NAME "users.db"
 // Initialize the database and create the users table if it doesn't exist
 sqlite3* initializeDatabase() {
