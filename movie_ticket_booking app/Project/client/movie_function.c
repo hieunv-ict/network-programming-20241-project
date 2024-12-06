@@ -28,3 +28,25 @@ int search_movie_by_title(int socketfd){
     }
     else return -1;
 }
+
+int browse_movie_by_category(int socketfd){
+    
+    char category[MAXLINE];
+    printf("Enter movie category: ");
+    scanf("%s", category);
+    char response[MAXLINE];
+    char* signal = get_string_from_signal(BROWSE);
+    char* datafield[] = {signal, category};
+    int msg_len = sizeof(datafield) / sizeof(datafield[0]);
+    char* message = concatenate_strings(datafield, msg_len);
+
+    sendStr(socketfd, message);
+    int n = recvStr(socketfd, response);
+    printf("%s \n", response);
+    if (n > 0){
+        parse_message(response, datafields, &fieldCount);
+        char* signal = datafields[0];
+        return get_signal_from_string(signal);
+    }
+    else return -1;
+}
