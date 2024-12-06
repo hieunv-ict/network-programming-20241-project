@@ -91,7 +91,7 @@ int main(int argc, char **argv)
             
             //TODO: add feature after logging in here:
 
-            //booking(socketfd, uname);
+            booking(socketfd, uname);
             break;
         case 2:
             do

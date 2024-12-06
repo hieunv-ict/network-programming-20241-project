@@ -313,21 +313,49 @@ void receiveMovie()
 
 void booking(int fd, char *uname)
 {
-    int choice;
+    int choice, re;
     socketfd = fd;
-    strcpy(ticket.order.uname, uname);
+    // strcpy(ticket.order.uname, uname);
 
     do
     {
-        printf("\n1. Movie Booking\n");
-        printf("2. Orders Management\n");
+        printf("\n1. Search for a movie\n");
+        printf("2. Browse movie by category\n");
+        printf("3. Select a movie to proceed with\n");
         printf("Please enter your choice: ");
         scanf("%d", &choice);
-    } while (choice < 1 || choice > 2);
+    } while (choice < 1 || choice > 3);
     printf("\n");
-    if (choice == 1)
+    switch (choice)
     {
-        sendInt(socketfd, BOOKING);
-        receiveMovie();
+        case 1:
+        // sendInt(socketfd, BOOKING);
+        // receiveMovie();
+            do
+            {
+                re = search_movie_by_title(socketfd);
+                if (re != SEARCHFOUND)
+                    printf("Cannot found movie\n\n");
+
+            } while (re != SEARCHFOUND);
+            printf("Found movie \n");
+            break;
+        case 2:
+            do
+            {
+                re = browse_movie_by_category(socketfd);
+                if (re != BROWSELIST)
+                    printf("Cannot find movie of that category!\n\n");
+
+            } while (re != BROWSELIST);
+            
+            printf("\nFound a list!\n");
+            
+            break;
+        case 3:
+            printf("Enter a movie id:");
+            // TODO: select movie
+            break;
     }
+    
 }

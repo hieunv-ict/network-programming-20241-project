@@ -5,19 +5,19 @@
 #include "database/sqlite/sqlite3.h"
 #define MAXLINE 4096
 
-void logIn(int socketfd)
-{
+// void logIn(int socketfd)
+// {
     
-    char uname[MAXLINE], passwd[MAXLINE];
+//     char uname[MAXLINE], passwd[MAXLINE];
 
-    recvStr(socketfd, uname);
-    recvStr(socketfd, passwd);
-    sendInt(socketfd, SUCCESS);
-    puts(uname);
+//     recvStr(socketfd, uname);
+//     recvStr(socketfd, passwd);
+//     sendInt(socketfd, SUCCESS);
+//     puts(uname);
 
 
-    char message[MAXLINE];
-}
+//     char message[MAXLINE];
+// }
 
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
     char *errMsg = 0;
