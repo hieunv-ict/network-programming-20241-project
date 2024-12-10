@@ -5,19 +5,6 @@
 #include "database/sqlite/sqlite3.h"
 #define MAXLINE 4096
 
-void logIn(int socketfd)
-{
-    
-    char uname[MAXLINE], passwd[MAXLINE];
-
-    recvStr(socketfd, uname);
-    recvStr(socketfd, passwd);
-    sendInt(socketfd, SUCCESS);
-    puts(uname);
-
-
-    char message[MAXLINE];
-}
 
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
     char *errMsg = 0;
@@ -53,6 +40,7 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
 
     // Execute the query
     if (sqlite3_step(stmt) == SQLITE_ROW) {
+        printf("Username: %s \n", username);
         const char *storedPassword = (const char *)sqlite3_column_text(stmt, 0);
         if (strcmp(storedPassword, password) == 0) {
             return SUCCESS;

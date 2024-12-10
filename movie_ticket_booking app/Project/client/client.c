@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
             } while (re != SEARCHFOUND);
             printf("Found movie \n");
-            
+            // print all movie with coressponding id
             break;
         default:
             break;

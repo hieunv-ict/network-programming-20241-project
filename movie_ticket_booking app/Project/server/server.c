@@ -159,9 +159,9 @@ int main(int argc, char **argv)
                     
                     break;
                 case SEARCH:
-                    char* title = datafields[1];
-                    printf("[+]%s:%d - Movie title requested: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), title);
-                    send_movie_list(connfd, title);
+                    //char* title = datafields[1];
+                    printf("[+]%s:%d - Movie title requested: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
+                    send_movie_list(app_db, connfd, datafields[1]);
                     
                     break;
                 case ORDERS:

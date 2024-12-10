@@ -7,6 +7,8 @@
 #define MAXLINE 1028
 int fieldCount;
 char datafields[][50];
+
+void parse_movie_list();
 int search_movie_by_title(int socketfd){
     
     char title[MAXLINE];
@@ -24,7 +26,17 @@ int search_movie_by_title(int socketfd){
     if (n > 0){
         parse_message(response, datafields, &fieldCount);
         char* signal = datafields[0];
+        parse_movie_list();
         return get_signal_from_string(signal);
     }
     else return -1;
+}
+
+void parse_movie_list(){
+    int index = 1;
+    printf("Movie list: \n");
+    while (strcmp(datafields[index], "") != 0){
+        printf("%s. %s \n",datafields[index], datafields[index+1]);
+        index+=2;
+    }
 }

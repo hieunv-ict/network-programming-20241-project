@@ -27,6 +27,7 @@ void parse_message(const char *message, char fields[][50], int *fieldCount) {
     }
 }
 char* concatenate_strings(char **strings, int count) {
+    
     int totalLength = 0;
     for (int i = 0; i < count; i++) {
         totalLength += strlen(strings[i]) + 1; // +1 for the delimiter or null terminator
