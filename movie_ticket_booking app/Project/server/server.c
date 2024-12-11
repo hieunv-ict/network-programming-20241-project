@@ -164,6 +164,8 @@ int main(int argc, char **argv)
                     send_movie_list(app_db, connfd, datafields[1]);
                     
                     break;
+                case BROWSE:
+                    printf("[+]%s:%d - Category requested: %s, Value: %s \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2]);
                 case ORDERS:
                     break;
 

@@ -51,6 +51,7 @@ int menuAuthen()
         printf("\n1. Login\n");
         printf("2. Signup\n");
         printf("3. Search movies by name\n");
+        printf("4. Browse movies \n");
         printf("4. Exit\n");
         printf("Please enter your choice: ");
         scanf("%d", &choice);
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
             {
                 re = logIn(socketfd, uname);
                 if (re == FAILURE)
-                    printf("wRONG PASSWORD!\n\n");
+                    printf("WRONG PASSWORD!\n\n");
                 else if (re == USERNOTFOUND){
                     printf("User not found! \n\n");
                 }
@@ -116,6 +117,23 @@ int main(int argc, char **argv)
             printf("Found movie \n");
             // print all movie with coressponding id
             break;
+
+        case 4:
+            do
+            {
+                printf("Browse movie by the following category: \n");
+                printf("1. Movie genre \n");
+                printf("2. Cinema \n");
+                printf("3. Showtime \n");
+                printf("Enter category: ");
+                int category = 0;
+                scanf("%d", &category);
+                re = browse_movie(socketfd, category);
+                if (re != BROWSEFOUND)
+                    printf("There are no movie satisfying your need. \n\n");
+
+            } while (re != BROWSEFOUND);
+            printf("This is the list of movies that meet your need: \n");
         default:
             break;
         }
