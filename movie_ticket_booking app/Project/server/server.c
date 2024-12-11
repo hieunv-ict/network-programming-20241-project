@@ -110,13 +110,13 @@ int main(int argc, char **argv)
                 }
                 else{
                     // no error in receiving message
-                    printf("Message sent from address %s:%d: ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    printf("[+]%s:%d client request: ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     puts(buf);
                 }
                 
                 parse_message(buf, datafields, &fieldCount);
                 char* signal = datafields[0];
-                printf("Signal: %s \n", signal);
+                // printf("Signal: %s \n", signal);
                 // state = ntohl(state);
                 state = get_signal_from_string(signal);
                 // open database
@@ -166,6 +166,7 @@ int main(int argc, char **argv)
                     break;
                 case BROWSE:
                     printf("[+]%s:%d - Category requested: %s, Value: %s \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2]);
+                    send_movies_browsed(app_db, connfd, datafields[1], datafields[2]);
                 case ORDERS:
                     break;
 
