@@ -14,7 +14,7 @@ int search_movie_by_title(int socketfd){
     
     char title[MAXLINE];
     printf("Enter movie title: ");
-    scanf("%s", title);
+    scanf("\n%[^\n]", title);
     char response[MAXLINE];
     char* signal = get_string_from_signal(SEARCH);
     char* datafield[] = {signal, title};
@@ -23,8 +23,9 @@ int search_movie_by_title(int socketfd){
 
     sendStr(socketfd, message);
     int n = recvStr(socketfd, response);
-    printf("%s \n", response);
+    // printf("%s \n", response);
     if (n > 0){
+        printf("Found movie \n");
         parse_message(response, datafields, &fieldCount);
         char* signal = datafields[0];
         parse_movie_list();
@@ -40,7 +41,7 @@ void parse_movie_list(){
         printf("%s. %s \n",datafields[index], datafields[index+1]);
         index+=2;
     }
-}
+} 
 
 int browse_movie(int socketfd, int category){
     char* genres[5] = {"Romance", "Action", "Sci-fi", "Fantasy", "Dramatic"};
@@ -58,7 +59,7 @@ int browse_movie(int socketfd, int category){
         int choice = 0;
         do {
             printf("Enter 1 movie genre you want to browse: ");
-        scanf("%d", &choice);
+            scanf("%d", &choice);
         }while(choice < 1 || choice > 5);
         
         //char* genre = "";
@@ -67,23 +68,37 @@ int browse_movie(int socketfd, int category){
         
     }
     else if (category == 2){
-        printf("Cinema list: \n");
+        char cinema_name_input[1024];
+        printf("Enter a cinema name: ");
+        // fflush(stdin);
+        scanf("\n%[^\n]", cinema_name_input);
 
+        strcpy(category_type, "Cinema");
+        strcpy(category_value, cinema_name_input);
     }
     else if (category == 3){
-        printf("Showtime list: \n");
+        char showtime[20];
+        printf("Enter a specific showtime: ");
+        scanf("\n%[^\n]", showtime);
+
+        strcpy(category_type, "Showtime");
+        strcpy(category_value, showtime);
     }
 
     // send message to server
     char* datafield[] = {signal, category_type, category_value};
     char* message = concatenate_strings(datafield, msg_len);
 
-    sendStr(socketfd, message);
+    sendStr(socketfd, message); 
     char response[MAXLINE];
-    int n = recvStr(socketfd, response);
-    printf("%s \n", response);
-    if (n < 0){
-        printf("Error \n");
+    recvStr(socketfd, response);
+    // printf("%s \n", response);
+
+    parse_message(response, datafields, &fieldCount);
+    parse_movie_list();
+
+    if (strcmp(response, "BROWSENOTFOUND") == 0){
+        // printf("Error \n");
         return BROWSENOTFOUND;
     }
     else{
@@ -92,9 +107,9 @@ int browse_movie(int socketfd, int category){
 }
 
 void get_cinema_list(){
-
+    
 }
 
 void get_showtime_list(){
-
+    
 }
