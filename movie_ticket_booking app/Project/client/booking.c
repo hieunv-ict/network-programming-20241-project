@@ -179,167 +179,37 @@ message ticket;
 //     selectSeat();
 // }
 
-// void selectTime()
-// {
-//     int select, valid = 0, indx;
-
-//     for (int i = 0; i < ticket.time.num; i++)
-//     {
-//         printf("%d: %s\n", ticket.time.id[i], ticket.time.name[i]);
-//     }
-//     do
-//     {
-//         printf("Please enter the ID of time: ");
-//         scanf("%d", &select);
-//         if (valueInArr(select, ticket.time.id, ticket.time.num) == 1)
-//         {
-//             printf("ID is invalid !\n");
-//         }
-//         else
-//             valid = 1;
-//     } while (valid == 0);
-//     printf("\n");
-
-//     indx = getIndex(ticket.time.id, ticket.time.num, select);
-//     ticket.order.time_id = select;
-//     strcpy(ticket.order.time, ticket.time.name[indx]);
-
-//     sendInt(socketfd, ticket.order.time_id);
-//     sendStr(socketfd, ticket.order.time);
-
-//     receiveSeat();
-// }
-
-// void receiveTime()
-// {
-//     sendInt(socketfd, TIME);
-//     ticket.time.num = recvInt(socketfd);
-
-//     for (int i = 0; i < ticket.time.num; i++)
-//     {
-//         ticket.time.id[i] = recvInt(socketfd);
-//         recvStr(socketfd, ticket.time.name[i]);
-//     }
-
-//     selectTime();
-// }
-
-// void selectCinema()
-// {
-//     int select, valid = 0, indx;
-
-//     for (int i = 0; i < ticket.cinema.num; i++)
-//     {
-//         printf("%d: %s\n", ticket.cinema.id[i], ticket.cinema.name[i]);
-//     }
-//     do
-//     {
-//         printf("Please enter the ID of cinema: ");
-//         scanf("%d", &select);
-//         if (valueInArr(select, ticket.cinema.id, ticket.cinema.num) == 1)
-//         {
-//             printf("ID is invalid !\n");
-//         }
-//         else
-//             valid = 1;
-//     } while (valid == 0);
-//     printf("\n");
-
-//     indx = getIndex(ticket.cinema.id, ticket.cinema.num, select);
-//     ticket.order.cinema_id = select;
-//     strcpy(ticket.order.cinema, ticket.cinema.name[indx]);
-
-//     sendInt(socketfd, ticket.order.cinema_id);
-//     sendStr(socketfd, ticket.order.cinema);
-
-//     receiveTime();
-// }
-
-// void receiveCinema()
-// {
-//     sendInt(socketfd, CINEMA);
-//     ticket.cinema.num = recvInt(socketfd);
-
-//     for (int i = 0; i < ticket.cinema.num; i++)
-//     {
-//         ticket.cinema.id[i] = recvInt(socketfd);
-//         recvStr(socketfd, ticket.cinema.name[i]);
-//     }
-
-//     selectCinema();
-// }
-
-// void selectMovie()
-// {
-//     int select, valid = 0, indx;
-
-//     for (int i = 0; i < ticket.movie.num; i++)
-//     {
-//         printf("%d: %s\n", ticket.movie.id[i], ticket.movie.name[i]);
-//     }
-//     do
-//     {
-//         printf("Please enter the ID of movie: ");
-//         scanf("%d", &select);
-//         if (valueInArr(select, ticket.movie.id, ticket.movie.num) == 1)
-//         {
-//             printf("ID is invalid !\n");
-//         }
-//         else
-//             valid = 1;
-//     } while (valid == 0);
-//     printf("\n");
-
-//     indx = getIndex(ticket.movie.id, ticket.movie.num, select);
-//     ticket.order.movie_id = select;
-//     strcpy(ticket.order.movie, ticket.movie.name[indx]);
-
-//     sendInt(socketfd, ticket.order.movie_id);
-//     sendStr(socketfd, ticket.order.movie);
-
-//     receiveCinema();
-// }
-
-// void receiveMovie()
-// {
-//     sendInt(socketfd, MOVIE);
-//     ticket.movie.num = recvInt(socketfd);
-
-//     for (int i = 0; i < ticket.movie.num; i++)
-//     {
-//         ticket.movie.id[i] = recvInt(socketfd);
-//         recvStr(socketfd, ticket.movie.name[i]);
-//     }
-//     selectMovie();
-// }
+char* movie_booking;
+char* cinema_booking;
+char* showtime_booking;
+void select_movie_to_book(int socketfd);
+void select_cinema_to_book(int socketfd);
+void select_showtime_to_book(int socketfd);
 
 void parse_response(char fields[][50]){
     int index = 1;
-    int cnt = 1;
     while (strcmp(fields[index], "") != 0){
-        printf("%d. %s \n",cnt++, fields[index+1]);
+        printf("%s. %s \n",fields[index], fields[index+1]);
         index+=2;
     }
 }
 
-int get_response_list(int socketfd, char* filter, int signal){
+int get_response_list(int socketfd, char* msg_fields[], int fields_cnt){
     // send message
-    char* signal_str = get_string_from_signal(signal);
-    char* datafield[2] = {signal_str, filter};
-    char* message = concatenate_strings(datafield, 2);
+    char* message = concatenate_strings(msg_fields, fields_cnt);
+    printf("Test: %s\n", message);
     sendStr(socketfd, message);
     // get response
     char response [MAXLINE];
     int n = recvStr(socketfd, response);
     int response_cnt = 0;
-    char fields[100][50];
     
+    char* signal_str;
+    char fields[100][50];
     if (n > 0){
-        printf("Response: %s \n", response);
         parse_message(response, fields, &response_cnt);
-        strcpy(signal_str, fields[0]);
+        signal_str = fields[0];
         parse_response(fields);
-       
         return get_signal_from_string(signal_str);
     }
     else{
@@ -347,7 +217,7 @@ int get_response_list(int socketfd, char* filter, int signal){
     }
 }
 
-void booking(int fd, char *uname)
+void booking(int socketfd, char *uname)
 {
     int choice;
     // socketfd = fd;
@@ -362,21 +232,17 @@ void booking(int fd, char *uname)
     printf("\n");
     if (choice == 1)
     {
+        // request list of all movie
+        char* signal = get_string_from_signal(BOOKING);
+        char* msg_fields[1] = {signal};
         //send MOVIE#movie_id
-        printf("Enter movie id: ");
-        int tmp;
-        scanf("%d", &tmp);
-        char movie_id[10];
-        sprintf(movie_id, "%d", tmp);
-        //receive list of movie
-        
-        int signal = get_response_list(fd, movie_id, MOVIE);
-        if (signal == MOVIECINEMA){
-            printf("The movie is screened in these cinemas. \n");
-            // process to select showtime
+        int signal_res = get_response_list(socketfd, msg_fields, 1);
+        if (signal_res == MOVIELIST){
+            printf("Select a movie. \n");
+            select_movie_to_book(socketfd);
         }
         else{
-            printf("The movie is not screened in any cinema. \n");
+            printf("There are no movie to be screened. \n");
         }
     }
         //choose movie
@@ -384,6 +250,62 @@ void booking(int fd, char *uname)
         //receive list of cinema for that movie
         //sendInt(socketfd, BOOKING);
         //receiveMovie();
+}
+
+void select_movie_to_book(int socketfd){
+    printf("Enter movie id: ");
+    int tmp;
+    scanf("%d", &tmp);
+    char movie_id[10];
+    sprintf(movie_id, "%d", tmp);
+    movie_booking = movie_id;
+    char* signal = get_string_from_signal(MOVIE);
+    char* msg_fields[2] = {signal, movie_booking};
+    int signal_res = get_response_list(socketfd, msg_fields, 2);
+    if (signal_res == MOVIECINEMA){
+        printf("Select a cinema. \n");
+        select_cinema_to_book(socketfd);
+        // process to select showtime
+    }
+    else{
+        printf("The movie is not screened in any cinema. \n");
+    }
+}
+
+void select_cinema_to_book(int socketfd){
+    printf("Enter cinema id: ");
+    char cinema_id[10];
+    scanf("%s", cinema_id);
+    cinema_booking = cinema_id;
+    char* signal = get_string_from_signal(CINEMA);
+    char* msg_fields[3] = {signal, movie_booking, cinema_booking};
+    int signal_res= get_response_list(socketfd, msg_fields, 3);
+    if (signal_res == CINEMASHOWTIME){
+        printf("Select a showtime: \n");
+        select_showtime_to_book(socketfd);
+        // process to select showtime
+    }
+    else{
+        printf("The movie has no showtime. \n");
+    }
+}
+
+void select_showtime_to_book(int socketfd){
+    printf("Enter showtime id: ");
+    char showtime_id[20];
+    scanf("%s", showtime_id);
+    showtime_booking = showtime_id;
+    char* signal = get_string_from_signal(SHOWTIME);
+    char* msg_fields[4] = {signal, movie_booking, cinema_booking, showtime_booking};
+    int signal_res= get_response_list(socketfd, msg_fields, 4);
+    if (signal_res == SHOWTIMESEATS){
+        printf("Seat map: \n");
+        
+        // process to select showtime
+    }
+    else{
+        printf("The movie has no showtime. \n");
+    }
 }
 
 

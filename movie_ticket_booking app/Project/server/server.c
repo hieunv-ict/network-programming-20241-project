@@ -171,26 +171,23 @@ int main(int argc, char **argv)
 
                 case BOOKING:
                     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    send_all_movie(connfd, app_db);
                     //setFd(connfd);
                     break;
 
                 case MOVIE:
                     printf("\n[+]%s:%d - Request MOVIE %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
                     send_cinema_list(connfd, app_db, datafields[1]);
-                    // sendListMovies(connfd);
-                    // ticket.movie_id = recvInt(connfd);
-                    // recvStr(connfd, ticket.movie);
-                    // printf("[+]%s:%d - Sent MOVIE\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    // printf("[+]%s:%d - Choose movie: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.movie);
                     break;
 
                 case CINEMA:
-                    printf("\n[+]%s:%d - Request CINEMA\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    sendListCinemas(connfd);
-                    ticket.cinema_id = recvInt(connfd);
-                    recvStr(connfd, ticket.cinema);
-                    printf("[+]%s:%d - Sent CINEMA\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    printf("[+]%s:%d - Choose cinema: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.cinema);
+                    printf("\n[+]%s:%d - Request MOVIE %s CINEMA %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2]);
+                    send_showtime_list(connfd, app_db, datafields[1], datafields[2]);
+                    break;
+                
+                case SHOWTIME:
+                    printf("\n[+]%s:%d - Request MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
+                    //send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
                     break;
 
                 case TIME:

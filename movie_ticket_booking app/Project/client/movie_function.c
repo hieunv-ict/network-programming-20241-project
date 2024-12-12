@@ -14,13 +14,7 @@ int search_movie_by_title(int socketfd){
     
     char title[128];
     printf("Enter movie title: ");
-    fflush(stdin);
-    if (fgets(title, sizeof(title), stdin)) {
-        size_t len = strlen(title);
-        if (len > 0 && title[len - 1] == '\n') {
-            title[len - 1] = '\0';
-        }
-    }
+    scanf("\n%[^\n]", title);
     char response[MAXLINE];
     char* signal = get_string_from_signal(SEARCH);
     char* datafield[] = {signal, title};
