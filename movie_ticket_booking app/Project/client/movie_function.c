@@ -12,7 +12,7 @@ char datafields[][50];
 void parse_movie_list();
 int search_movie_by_title(int socketfd){
     
-    char title[MAXLINE];
+    char title[128];
     printf("Enter movie title: ");
     scanf("\n%[^\n]", title);
     char response[MAXLINE];
@@ -24,6 +24,7 @@ int search_movie_by_title(int socketfd){
     sendStr(socketfd, message);
     int n = recvStr(socketfd, response);
     // printf("%s \n", response);
+    //printf("%s \n", response);
     if (n > 0){
         printf("Found movie \n");
         parse_message(response, datafields, &fieldCount);
@@ -36,9 +37,8 @@ int search_movie_by_title(int socketfd){
 
 void parse_movie_list(){
     int index = 1;
-    printf("Movie list: \n");
     while (strcmp(datafields[index], "") != 0){
-        printf("%s. %s \n",datafields[index], datafields[index+1]);
+        printf("ID: %s - %s \n",datafields[index], datafields[index+1]);
         index+=2;
     }
 } 

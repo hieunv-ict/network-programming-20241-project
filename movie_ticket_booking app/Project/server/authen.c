@@ -50,7 +50,8 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
         }
     } 
     else {
-        return USERNOTFOUND; 
+        printf("Username not found \n");
+        return USERNOTFOUND;
     }
     sqlite3_finalize(stmt);
 }

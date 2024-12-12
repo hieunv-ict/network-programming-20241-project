@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
-#include "sqlite/sqlite3.h"
-#define DB_NAME "users.db"
+#include <string.h>
+#include "sqlite3.h"
+#define DBNAME "users.db"
+#define QUERY_NUM 9
 // Initialize the database and create the users table if it doesn't exist
 sqlite3* initializeDatabase() {
     sqlite3 *db;
@@ -12,8 +13,8 @@ sqlite3* initializeDatabase() {
                       "id INTEGER PRIMARY KEY AUTOINCREMENT, " \
                       "username TEXT UNIQUE NOT NULL, " \
                       "password TEXT NOT NULL);";
- 
-    if (sqlite3_open(DB_NAME, &db) != SQLITE_OK) {
+
+    if (sqlite3_open(DBNAME, &db) != SQLITE_OK) {
         fprintf(stderr, "Could not open database: %s\n", sqlite3_errmsg(db));
         exit(1);
     }
@@ -67,6 +68,7 @@ sqlite3* initializeDatabase() {
         "Cinema_name TEXT,"
         "Cinema_location TEXT"
         ");";
+
     char* sql_theatre = 
     "CREATE TABLE IF NOT EXISTS Theatre ("
         "Theatre_id TEXT PRIMARY KEY, "
@@ -75,6 +77,7 @@ sqlite3* initializeDatabase() {
         "Cinema_id TEXT,"
         "FOREIGN KEY (Cinema_id) REFERENCES Cinema(Cinema_id)"
         ");";
+
     char* sql_showtime = 
     "CREATE TABLE IF NOT EXISTS Showtime ("
         "Showtime_id TEXT PRIMARY KEY, "
@@ -85,10 +88,56 @@ sqlite3* initializeDatabase() {
         "FOREIGN KEY (Movie_id) REFERENCES Movie(Movie_id)"
         ");";
 
+    char* sql_seat = 
+    "CREATE TABLE IF NOT EXISTS Seat("
+        "Seat_id TEXT PRIMARY KEY"
+        ");";
+    
+    char* sql_seat_theatre =
+    "CREATE TABLE IF NOT EXISTS SeatTheatre("
+        "Seat_id TEXT,"
+        "Theatre_id TEXT,"
+        "Status TEXT,"
+        "FOREIGN KEY (Seat_id) REFERENCES Seat(Seat_id),"
+        "FOREIGN KEY (Theatre_id) REFERENCES Theatre(Theatre_id)"
+        ");";
+
+    char* sql_book = 
+    "CREATE TABLE IF NOT EXISTS Booking("
+        "Booking_id INTEGER PRIMARY KEY,"
+        "Showtime_id TEXT,"
+        "Fee REAL,"
+        "FOREIGN KEY (Showtime_id) REFERENCES Showtime(Showtime_id)"
+        ");";
+
+    char * sql_booking_seat = 
+        "CREATE TABLE IF NOT EXISTS BookingSeat("
+            "Seat_id TEXT,"
+            "Booking_id INTEGER,"
+            "FOREIGN KEY (Seat_id) REFERENCES Seat(Seat_id),"
+            "FOREIGN KEY (Booking_id) REFERENCES Booking(Booking_id)"
+            ");";
+
+    char* sql_ticket = 
+    "CREATE TABLE IF NOT EXISTS Ticket("
+        "Ticket_type_id TEXT PRIMARY KEY,"
+        "Ticket_type TEXT,"
+        "Ticket_price REAL"
+        ");";
+
+    char* sql_ticket_booking = 
+    "CREATE TABLE IF NOT EXISTS TicketBooking("
+        "Booking_id INTEGER, "
+        "Ticket_type TEXT, "
+        "Ticket_quantity INTEGER, "
+        "FOREIGN KEY (Ticket_type) REFERENCES Ticket(Ticket_type_id)"
+        ");";
+
     // Execute SQL statement for the Movie table
 
-    char* create_query[3] = {sql_cinema, sql_theatre, sql_showtime};
-    for (int i = 0; i < 3; i++)
+    
+    char* create_query[QUERY_NUM] = {sql_cinema, sql_theatre, sql_showtime, sql_seat, sql_seat_theatre, sql_book, sql_booking_seat, sql_ticket, sql_ticket_booking};
+    for (int i = 0; i < QUERY_NUM; i++)
     {
         if (strcmp(create_query[i], "") != 0){
             rc = sqlite3_exec(db, create_query[i], 0, 0, &errMsg);
