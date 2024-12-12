@@ -12,9 +12,15 @@ char datafields[][50];
 void parse_movie_list();
 int search_movie_by_title(int socketfd){
     
-    char title[MAXLINE];
+    char title[128];
     printf("Enter movie title: ");
-    scanf("%s", title);
+    fflush(stdin);
+    if (fgets(title, sizeof(title), stdin)) {
+        size_t len = strlen(title);
+        if (len > 0 && title[len - 1] == '\n') {
+            title[len - 1] = '\0';
+        }
+    }
     char response[MAXLINE];
     char* signal = get_string_from_signal(SEARCH);
     char* datafield[] = {signal, title};
@@ -23,7 +29,7 @@ int search_movie_by_title(int socketfd){
 
     sendStr(socketfd, message);
     int n = recvStr(socketfd, response);
-    printf("%s \n", response);
+    //printf("%s \n", response);
     if (n > 0){
         parse_message(response, datafields, &fieldCount);
         char* signal = datafields[0];
@@ -35,9 +41,8 @@ int search_movie_by_title(int socketfd){
 
 void parse_movie_list(){
     int index = 1;
-    printf("Movie list: \n");
     while (strcmp(datafields[index], "") != 0){
-        printf("%s. %s \n",datafields[index], datafields[index+1]);
+        printf("ID: %s - %s \n",datafields[index], datafields[index+1]);
         index+=2;
     }
 }

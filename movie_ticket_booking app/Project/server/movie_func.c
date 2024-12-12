@@ -38,12 +38,13 @@ int select_movie(sqlite3* db, const char* query, const char* filter, char* (movi
         sqlite3_close(db);
         return 0;
     }
+    printf("Filter: %s \n", filter);
     sqlite3_bind_text(stmt, 1, filter, -1, SQLITE_STATIC);
 
     
     while ((rc=sqlite3_step(stmt)) == SQLITE_ROW) {
         int movie_id = sqlite3_column_int(stmt, 0);
-
+        printf("Filter: %s \n", filter);
         int director_id = sqlite3_column_int(stmt, 1);
         const unsigned char *title = sqlite3_column_text(stmt, 2);
         const char *category = (const char*)sqlite3_column_text(stmt, 3);
@@ -121,6 +122,7 @@ void query_movie(sqlite3* db, const char* movie_title,const char* sql, char list
     char* movie_data[1024][5];
     int movie_cnt = select_movie(db, sql, movie_title, movie_data);
 
+    
     // Get movie_id and movie title to process into string
     for (int i = 0; i < movie_cnt; i++){   
         char element[MAXLINE] = "";
@@ -134,6 +136,7 @@ void query_movie(sqlite3* db, const char* movie_title,const char* sql, char list
             strcat(list, "#");
         }
     }
+    
 }
 
 void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value){

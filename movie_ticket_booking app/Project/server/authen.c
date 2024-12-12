@@ -9,7 +9,7 @@
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
     char *errMsg = 0;
     char sql[256];
-    printf("Sign up: %s %s", username, password);
+    printf("Sign up: %s %s \n", username, password);
     // Insert the user into the database
     snprintf(sql, sizeof(sql), "INSERT INTO users (username, password) VALUES ('%s', '%s');", username, password);
 
@@ -50,6 +50,7 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
         }
     } 
     else {
+        printf("Username not found \n");
         return USERNOTFOUND;
     }
     sqlite3_finalize(stmt);

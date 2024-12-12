@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include "authen.h"
+#include "cinema.h"
 #include "booking.h"
 #include "movie_func.h"
 #include "../lib/message.h"
@@ -166,21 +167,21 @@ int main(int argc, char **argv)
                     break;
                 case BROWSE:
                     printf("[+]%s:%d - Category requested: %s, Value: %s \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2]);
-                case ORDERS:
-                    break;
+                    
 
                 case BOOKING:
                     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    setFd(connfd);
+                    //setFd(connfd);
                     break;
 
                 case MOVIE:
-                    printf("\n[+]%s:%d - Request MOVIE\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    sendListMovies(connfd);
-                    ticket.movie_id = recvInt(connfd);
-                    recvStr(connfd, ticket.movie);
-                    printf("[+]%s:%d - Sent MOVIE\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    printf("[+]%s:%d - Choose movie: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.movie);
+                    printf("\n[+]%s:%d - Request MOVIE %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
+                    send_cinema_list(connfd, app_db, datafields[1]);
+                    // sendListMovies(connfd);
+                    // ticket.movie_id = recvInt(connfd);
+                    // recvStr(connfd, ticket.movie);
+                    // printf("[+]%s:%d - Sent MOVIE\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    // printf("[+]%s:%d - Choose movie: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.movie);
                     break;
 
                 case CINEMA:
