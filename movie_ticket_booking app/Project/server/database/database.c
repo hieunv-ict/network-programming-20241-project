@@ -63,7 +63,7 @@ sqlite3* initializeDatabase() {
     }
     char* sql_cinema = 
     "CREATE TABLE IF NOT EXISTS Cinema ("
-        "Cinema_id TEXT PRIMARY KEY, "
+        "Cinema_id INTEGER PRIMARY KEY, "
         "Cinema_name TEXT,"
         "Cinema_location TEXT"
         ");";
@@ -77,7 +77,7 @@ sqlite3* initializeDatabase() {
         ");";
     char* sql_showtime = 
     "CREATE TABLE IF NOT EXISTS Showtime ("
-        "Showtime_id TEXT PRIMARY KEY, "
+        "Showtime_id INTEGER PRIMARY KEY, "
         "Datetime TEXT, "
         "Movie_id INTEGER, "
         "Theatre_id TEXT, "

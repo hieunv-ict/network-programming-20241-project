@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         default:
             break;
         }
-    }while(choice == 2);
+    }while(choice > 1 && choice < 5);
     
     
     return 0;

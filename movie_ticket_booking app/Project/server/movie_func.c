@@ -139,7 +139,6 @@ int query_movie(sqlite3* db, const char* movie_title,const char* sql, char list[
 }
 
 void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value){
-    
     char tmp_val[128];
     strcpy(tmp_val, value);
     char result[MAXLINE] = "";
@@ -149,12 +148,12 @@ void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value)
         response_movie_list(socketfd, BROWSE, mov_cnt, result);
     }
     else if (strcmp(category, "Cinema") == 0) {
-        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Showtime.Movie_id = Movie.Movie_id JOIN Theatre ON Theatre.Theatre_id = Showtime.Theatre_id JOIN Cinema ON Cinema.Cinema_id = Theatre.Cinema_id WHERE Cinema.Cinema_name = ?; ";
+        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Showtime.Movie_id = Movie.Movie_id JOIN Theatre ON Theatre.Theatre_id = Showtime.Theatre_id JOIN Cinema ON Cinema.Cinema_id = Theatre.Cinema_id WHERE Cinema.Cinema_id = ?; ";
         int mov_cnt = query_movie(db, value, sql, result);
         response_movie_list(socketfd, BROWSE, mov_cnt, result);
     }
     else {
-        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Movie.Movie_id = Showtime.Movie_id WHERE Showtime.Datetime = ?; ";
+        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Movie.Movie_id = Showtime.Movie_id WHERE Showtime.Showtime_id = ?; ";
         int mov_cnt = query_movie(db, value, sql, result);
         response_movie_list(socketfd, BROWSE, mov_cnt, result);
     }

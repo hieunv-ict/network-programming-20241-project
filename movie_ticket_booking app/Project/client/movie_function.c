@@ -45,6 +45,9 @@ void parse_movie_list(){
 
 int browse_movie(int socketfd, int category){
     char* genres[5] = {"Romance", "Action", "Sci-fi", "Fantasy", "Dramatic"};
+    char* cinemas[4] = {"CGV Aeon Ha Dong", "Lotte Ha Dong", "CGV Vincom Times City", "Lotte Thang Long"};
+    char* showtimes[6] = {"2024/12/1 19:00:00", "2024/12/1 20:00:00", "2024/12/1 21:00:00", 
+                          "2024/12/2 19:00:00", "2024/12/2 20:00:00", "2024/12/2 21:00:00"};
     char* signal = get_string_from_signal(BROWSE);
     char category_type[128] = "";
     char category_value[128] = "";
@@ -71,18 +74,42 @@ int browse_movie(int socketfd, int category){
         char cinema_name_input[1024];
         printf("Enter a cinema name: ");
         // fflush(stdin);
-        scanf("\n%[^\n]", cinema_name_input);
+        // scanf("\n%[^\n]", cinema_name_input);
+
+        // print list of available genres
+        printf("List of cinemas: \n");
+        for (int i = 0; i < 4; i++){
+            printf("%d. %s \n", i+1, cinemas[i]);
+        }
+        // allow user to select genre
+        int choice = 0;
+        do {
+            printf("Enter 1 cinema you want to browse: ");
+            scanf("%d", &choice);
+        }while(choice < 1 || choice > 4);
 
         strcpy(category_type, "Cinema");
-        strcpy(category_value, cinema_name_input);
+        strcpy(category_value, cinemas[choice-1]);
     }
     else if (category == 3){
-        char showtime[20];
-        printf("Enter a specific showtime: ");
-        scanf("\n%[^\n]", showtime);
+        // char showtime[20];
+        // printf("Enter a specific showtime: ");
+        // scanf("\n%[^\n]", showtime);
+
+        // print list of available genres
+        printf("List of showtimes: \n");
+        for (int i = 0; i < 6; i++){
+            printf("%d. %s \n", i+1, showtimes[i]);
+        }
+        // allow user to select genre
+        int choice = 0;
+        do {
+            printf("Enter 1 movie genre you want to browse: ");
+            scanf("%d", &choice);
+        }while(choice < 1 || choice > 6);
 
         strcpy(category_type, "Showtime");
-        strcpy(category_value, showtime);
+        strcpy(category_value, showtimes[choice-1]);
     }
 
     // send message to server
@@ -95,7 +122,9 @@ int browse_movie(int socketfd, int category){
     // printf("%s \n", response);
 
     parse_message(response, datafields, &fieldCount);
-    parse_movie_list();
+    // printf("Field count: %d", fieldCount);
+    if (fieldCount>1)
+        parse_movie_list();
 
     if (strcmp(response, "BROWSENOTFOUND") == 0){
         // printf("Error \n");
