@@ -197,7 +197,6 @@ void parse_response(char fields[][50]){
 int get_response_list(int socketfd, char* msg_fields[], int fields_cnt){
     // send message
     char* message = concatenate_strings(msg_fields, fields_cnt);
-    printf("Test: %s\n", message);
     sendStr(socketfd, message);
     // get response
     char response [MAXLINE];
@@ -208,6 +207,41 @@ int get_response_list(int socketfd, char* msg_fields[], int fields_cnt){
     char fields[100][50];
     if (n > 0){
         parse_message(response, fields, &response_cnt);
+        signal_str = fields[0];
+        parse_response(fields);
+        return get_signal_from_string(signal_str);
+    }
+    else{
+        printf("Connection error \n");
+    }
+}
+int get_seat_map(int socketfd, char* msg_fields[], int fields_cnt){
+    // send message
+    char* message = concatenate_strings(msg_fields, fields_cnt);
+    sendStr(socketfd, message);
+    // get response
+    char response [MAXLINE];
+    int n = recvStr(socketfd, response);
+    int response_cnt = 0;
+    
+    char* signal_str;
+    char fields[100][50];
+    if (n > 0){
+        //parse_message(response, fields, &response_cnt);
+        int index = 1;
+        int col_cnt = 0;
+        char* seat_status = "Available";
+        while (strcmp(fields[index], "") != 0){
+            if (strcmp(fields[index+1], "0") != 0){
+                seat_status = "Reserved";
+            }
+            printf("%s. %s ",fields[index], seat_status);
+            if (index % 8 == 0){
+                printf("\n");
+            }
+            index+=2;
+            
+    }
         signal_str = fields[0];
         parse_response(fields);
         return get_signal_from_string(signal_str);
@@ -232,24 +266,9 @@ void booking(int socketfd, char *uname)
     printf("\n");
     if (choice == 1)
     {
-        // request list of all movie
-        char* signal = get_string_from_signal(BOOKING);
-        char* msg_fields[1] = {signal};
-        //send MOVIE#movie_id
-        int signal_res = get_response_list(socketfd, msg_fields, 1);
-        if (signal_res == MOVIELIST){
-            printf("Select a movie. \n");
-            select_movie_to_book(socketfd);
-        }
-        else{
-            printf("There are no movie to be screened. \n");
-        }
+        // select movie
+        select_movie_to_book(socketfd);   
     }
-        //choose movie
-        //send MOVIE#movie_id
-        //receive list of cinema for that movie
-        //sendInt(socketfd, BOOKING);
-        //receiveMovie();
 }
 
 void select_movie_to_book(int socketfd){
@@ -265,7 +284,6 @@ void select_movie_to_book(int socketfd){
     if (signal_res == MOVIECINEMA){
         printf("Select a cinema. \n");
         select_cinema_to_book(socketfd);
-        // process to select showtime
     }
     else{
         printf("The movie is not screened in any cinema. \n");
@@ -283,7 +301,6 @@ void select_cinema_to_book(int socketfd){
     if (signal_res == CINEMASHOWTIME){
         printf("Select a showtime: \n");
         select_showtime_to_book(socketfd);
-        // process to select showtime
     }
     else{
         printf("The movie has no showtime. \n");
@@ -297,15 +314,21 @@ void select_showtime_to_book(int socketfd){
     showtime_booking = showtime_id;
     char* signal = get_string_from_signal(SHOWTIME);
     char* msg_fields[4] = {signal, movie_booking, cinema_booking, showtime_booking};
-    int signal_res= get_response_list(socketfd, msg_fields, 4);
+    printf("Seat map: \n");
+    int signal_res= get_seat_map(socketfd, msg_fields, 4);
     if (signal_res == SHOWTIMESEATS){
-        printf("Seat map: \n");
         
-        // process to select showtime
     }
     else{
-        printf("The movie has no showtime. \n");
+        printf("The movie is not screened in any theatre. \n");
     }
+}
+
+void select_seats(int socketfd){
+    printf("Enter number of seats: ");
+    int seat_num = 0;
+    scanf("%d", &seat_num);
+
 }
 
 

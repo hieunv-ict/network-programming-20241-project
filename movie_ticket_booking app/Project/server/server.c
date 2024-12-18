@@ -25,7 +25,7 @@ sqlite3* app_db;
 // new 
 char buf[MAXLINE];
 int fieldCount;
-char datafields[][50];
+char datafields[100][50];
 void initServer()
 {
     struct sockaddr_in servaddr;
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
                 case BROWSE:
                     printf("[+]%s:%d - Category requested: %s, Value: %s \n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2]);
                     send_movies_browsed(app_db, connfd, datafields[1], datafields[2]);
-                
+                    break;
 
                 case BOOKING:
                     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
                 
                 case SHOWTIME:
                     printf("\n[+]%s:%d - Request MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
-                    //send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
+                    send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
                     break;
 
                 case TIME:

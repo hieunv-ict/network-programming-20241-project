@@ -62,6 +62,7 @@ int menuAuthen()
 int main(int argc, char **argv)
 {
     int choice = 0, re;
+    int exit_flag = 1;
     char uname[MAXLINE];
     if (argc != 2)
     {
@@ -137,10 +138,16 @@ int main(int argc, char **argv)
 
             } while (re != BROWSEFOUND);
             // printf("This is the list of movies that meet your need: \n");
+            break;
+
+        case 5:
+            printf("You have exited!\n");
+            exit_flag = 0;
+            break;
         default:
             break;
         }
-    }while(choice == 2);
+    }while(exit_flag != 0);
     
     
     return 0;

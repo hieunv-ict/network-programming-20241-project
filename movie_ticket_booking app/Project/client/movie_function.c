@@ -7,11 +7,11 @@
 
 #define MAXLINE 1028
 int fieldCount;
-char datafields[][50];
 
-void parse_movie_list();
+
+void parse_movie_list(char datafields[][50]);
 int search_movie_by_title(int socketfd){
-    
+    char datafields[100][50];
     char title[128];
     printf("Enter movie title: ");
     scanf("\n%[^\n]", title);
@@ -26,16 +26,15 @@ int search_movie_by_title(int socketfd){
     // printf("%s \n", response);
     //printf("%s \n", response);
     if (n > 0){
-        printf("Found movie \n");
         parse_message(response, datafields, &fieldCount);
         char* signal = datafields[0];
-        parse_movie_list();
+        parse_movie_list(datafields);
         return get_signal_from_string(signal);
     }
     else return -1;
 }
 
-void parse_movie_list(){
+void parse_movie_list(char datafields[][50]){
     int index = 1;
     while (strcmp(datafields[index], "") != 0){
         printf("ID: %s - %s \n",datafields[index], datafields[index+1]);
@@ -93,9 +92,9 @@ int browse_movie(int socketfd, int category){
     char response[MAXLINE];
     recvStr(socketfd, response);
     // printf("%s \n", response);
-
+    char datafields[100][50];
     parse_message(response, datafields, &fieldCount);
-    parse_movie_list();
+    parse_movie_list(datafields);
 
     if (strcmp(response, "BROWSENOTFOUND") == 0){
         // printf("Error \n");
