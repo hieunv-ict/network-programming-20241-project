@@ -9,8 +9,8 @@
 int flag = 0;
 
 int select_movie(sqlite3* db, const char* query, const char* filter, char* (buf)[][5]);
-void response_movie_list(int socketfd, char list[]);
-void query_movie(sqlite3* db, const char* title, const char* sql, char list[]);
+void response_movie_list(int socketfd, int signal, int movie_count, char list[]);
+int query_movie(sqlite3* db, const char* title, const char* sql, char list[]);
 
 // pass in socketfd number and an array of 5 datafield of movie
 // list has the format #movie_id_i#movie_title_i#...
@@ -70,7 +70,7 @@ int select_movie(sqlite3* db, const char* query, const char* filter, char* (movi
     }   
     
     if (cnt == 0){
-        printf("No movie \n");
+        // printf("No movie \n");
     }
 
     if (rc != SQLITE_DONE) {
@@ -82,25 +82,26 @@ int select_movie(sqlite3* db, const char* query, const char* filter, char* (movi
     sqlite3_close(db);
     return cnt;
 }
-void response_movie_list(int socketfd, char list[]){
+
+void response_movie_list(int socketfd, int signal_num, int movie_count, char list[]){
     char* datafields[2];
     datafields[0] = (char*)malloc(sizeof(char) * 128);
     datafields[1] = (char*)malloc(sizeof(char) * MAXLINE);
-    if (flag > 0){
-        char* signal = get_string_from_signal(SEARCHFOUND);
+    if (movie_count > 0){
+        char* signal = get_string_from_signal(signal_num+1);
         strcpy(datafields[0], signal);
         strcpy(datafields[1], list);
         
         int msg_len = 2;
         char* message = concatenate_strings(datafields, msg_len);
-        printf("Respone: %s \n", message);
+        printf("Response: %s \n", message);
         sendStr(socketfd, message);
-        printf("Found \n");
+        // printf("Found \n");
         
     }
     else{
-        printf("No movie is send \n");
-        char* signal = get_string_from_signal(SEARCHNOTFOUND);
+        // printf("No movie is send \n");
+        char* signal = get_string_from_signal(signal_num+2);
         sendStr(socketfd, signal);
     }
 }
@@ -111,13 +112,13 @@ void send_movie_list(sqlite3* db, int socketfd, char title[]){
     char list[MAXLINE] = "";
     //query database to get result and store result in list
     const char* sql = "SELECT * FROM Movie WHERE Title = ?;";
-    query_movie(db, tmp, sql, list);
+    int mov_cnt = query_movie(db, tmp, sql, list);
     // send message to client
-    response_movie_list(socketfd, list);
+    response_movie_list(socketfd, SEARCH, mov_cnt, list);
 
 }
 
-void query_movie(sqlite3* db, const char* movie_title,const char* sql, char list[]){
+int query_movie(sqlite3* db, const char* movie_title,const char* sql, char list[]){
     // Get movie_data
     char* movie_data[1024][5];
     int movie_cnt = select_movie(db, sql, movie_title, movie_data);
@@ -136,7 +137,7 @@ void query_movie(sqlite3* db, const char* movie_title,const char* sql, char list
             strcat(list, "#");
         }
     }
-    
+    return movie_cnt;
 }
 
 void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value){
@@ -146,11 +147,19 @@ void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value)
     char result[MAXLINE] = "";
     if (strcmp(category, "Genre") == 0){
         const char* sql = "SELECT * FROM Movie WHERE Category = ?;";
-        query_movie(db, value, sql, result);
+        int mov_cnt = query_movie(db, value, sql, result);
+        response_movie_list(socketfd, BROWSE, mov_cnt, result);
     }
-    
-    
-
+    else if (strcmp(category, "Cinema") == 0) {
+        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Showtime.Movie_id = Movie.Movie_id JOIN Theatre ON Theatre.Theatre_id = Showtime.Theatre_id JOIN Cinema ON Cinema.Cinema_id = Theatre.Cinema_id WHERE Cinema.Cinema_name = ?; ";
+        int mov_cnt = query_movie(db, value, sql, result);
+        response_movie_list(socketfd, BROWSE, mov_cnt, result);
+    }
+    else {
+        const char* sql = "SELECT Movie.Movie_id, Movie.Director_id, Movie.Title, Movie.Category, Movie.Duration FROM Movie JOIN Showtime ON Movie.Movie_id = Showtime.Movie_id WHERE Showtime.Datetime = ?; ";
+        int mov_cnt = query_movie(db, value, sql, result);
+        response_movie_list(socketfd, BROWSE, mov_cnt, result);
+    }
 }
 
 

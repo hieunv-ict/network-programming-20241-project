@@ -9,7 +9,7 @@
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
     char *errMsg = 0;
     char sql[256];
-    printf("Sign up: %s %s \n", username, password);
+    // printf("Sign up: %s %s", username, password);
     // Insert the user into the database
     snprintf(sql, sizeof(sql), "INSERT INTO users (username, password) VALUES ('%s', '%s');", username, password);
 
@@ -40,7 +40,7 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
 
     // Execute the query
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        printf("Username: %s \n", username);
+        // printf("Username: %s \n", username);
         const char *storedPassword = (const char *)sqlite3_column_text(stmt, 0);
         if (strcmp(storedPassword, password) == 0) {
             return SUCCESS;

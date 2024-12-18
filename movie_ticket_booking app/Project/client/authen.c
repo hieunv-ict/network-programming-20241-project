@@ -12,7 +12,7 @@ int logIn(int socketfd, char *uname)
     int state;
 
     printf("Account: ");
-    scanf("%s", uname);
+    scanf("%s", uname); 
     printf("Password: ");
     scanf("%s", passwd);
     // concatenate all data fields into a message with correct format

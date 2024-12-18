@@ -52,16 +52,17 @@ int menuAuthen()
         printf("2. Signup\n");
         printf("3. Search movies by name\n");
         printf("4. Browse movies \n");
-        printf("4. Exit\n");
+        printf("5. Exit\n");
         printf("Please enter your choice: ");
         scanf("%d", &choice);
-    } while (choice < 1 || choice > 4);
+    } while (choice < 1 || choice > 5);
     return choice;
 }
 
 int main(int argc, char **argv)
 {
     int choice = 0, re;
+    int exit_flag = 1;
     char uname[MAXLINE];
     if (argc != 2)
     {
@@ -114,7 +115,6 @@ int main(int argc, char **argv)
                     printf("Cannot found movie\n\n");
 
             } while (re != SEARCHFOUND);
-            printf("Found movie \n");
             // print all movie with coressponding id
             break;
 
@@ -128,18 +128,26 @@ int main(int argc, char **argv)
                 printf("Enter category: ");
                 int category = 0;
                 scanf("%d", &category);
+                if(category > 3 || category < 1) {
+                    printf("Category invalid. Try again!\n");
+                    continue;
+                }
                 re = browse_movie(socketfd, category);
                 if (re != BROWSEFOUND)
                     printf("There are no movie satisfying your need. \n\n");
 
             } while (re != BROWSEFOUND);
-            printf("This is the list of movies that meet your need: \n");
-            // after browse movie user can choose a movie to book ticket
-            
+            // printf("This is the list of movies that meet your need: \n");
+            break;
+
+        case 5:
+            printf("You have exited!\n");
+            exit_flag = 0;
+            break;
         default:
             break;
         }
-    }while(choice == 2);
+    }while(exit_flag != 0);
     
     
     return 0;

@@ -84,7 +84,7 @@ int select_cinema(sqlite3* db, const char* query, const char* filters[], int fil
 
 }
 
-int cinema_message(sqlite3* db, const char* filter[] ,int filter_cnt, const char* sql, char list[]){
+int booking_response(sqlite3* db, const char* filter[] ,int filter_cnt, const char* sql, char list[]){
     // Get movie_data
     char* data[1024][2];
     
@@ -102,14 +102,17 @@ int cinema_message(sqlite3* db, const char* filter[] ,int filter_cnt, const char
         strcpy(temp, element);
         
         strcat(list, temp);
-        strcat(list, "#");
+        if (i < cnt - 1){
+            strcat(list, "#");
+        }
+        
     }
-
+    printf("Response: %s \n", list);
     if (cnt == 0) return 0;
     else return 1;
 }
 
-void response_cinema_list(int socketfd, char list[], int flag, int sig){
+void response_booking_info(int socketfd, char list[], int flag, int sig){
     char* datafields[2];
     // printf("Response: %s\n", list);
     datafields[0] = (char*)malloc(sizeof(char) * 128);
@@ -132,11 +135,11 @@ void response_cinema_list(int socketfd, char list[], int flag, int sig){
 
 void send_all_movie(int socketfd, sqlite3* db){
     const char* get_movie = 
-    "SELECT Movie.Movie_id, Movie.Title FROM MOVIE WHERE Duration > ?;";
+    "SELECT Movie.Movie_id, Movie.Title FROM Movie WHERE Duration > ?;";
     char list[MAXLINE] = "";
     const char* filter[1] = {"1"};
-    int flag = cinema_message(db, filter, 1, get_movie, list);
-    response_cinema_list(socketfd, list, flag, MOVIELIST);
+    int flag = booking_response(db, filter, 1, get_movie, list);
+    response_booking_info(socketfd, list, flag, MOVIELIST);
 
 }
 void send_cinema_list(int socketfd, sqlite3* db, char* movie_id){
@@ -150,8 +153,8 @@ void send_cinema_list(int socketfd, sqlite3* db, char* movie_id){
     ";";
     char list[MAXLINE] = "";
     const char* filter[1] = {movie_id};
-    int flag = cinema_message(db, filter, 1, get_cinema, list);
-    response_cinema_list(socketfd, list, flag, MOVIECINEMA);
+    int flag = booking_response(db, filter, 1, get_cinema, list);
+    response_booking_info(socketfd, list, flag, MOVIECINEMA);
     
 }
 
@@ -166,6 +169,23 @@ void send_showtime_list(int socketfd, sqlite3* db, char* movie_id, char* cinema_
     ";";
     char list[MAXLINE] = "";
     const char* filter[2] = {movie_id, cinema_id};
-    int flag = cinema_message(db, filter, 2, get_showtime, list);
-    response_cinema_list(socketfd, list, flag, CINEMASHOWTIME);
+    int flag = booking_response(db, filter, 2, get_showtime, list);
+    response_booking_info(socketfd, list, flag, CINEMASHOWTIME);
+}
+
+void send_seats(int socketfd, sqlite3* db, char* movie_id, char* cinema_id, char* showtime_id){
+    const char* get_seats =
+    "SELECT SeatTheatre.Seat_id, SeatTheatre.Status FROM SeatTheatre "
+    "INNER JOIN "
+    "Theatre ON Theatre.Theatre_id = SeatTheatre.Theatre_id "
+    "INNER JOIN "
+    "Cinema ON Cinema.Cinema_id = Theatre.Cinema_id "
+    "INNER JOIN "
+    "Showtime ON Showtime.Theatre_id = Theatre.Theatre_id "
+    "WHERE Showtime.Movie_id = ? AND Cinema.cinema_id = ? AND Showtime.Showtime_id = ?"
+    ";";
+    char list[MAXLINE] = "";
+    const char* filter[3] = {movie_id, cinema_id, showtime_id};
+    int flag = booking_response(db, filter, 3, get_seats, list);
+    response_booking_info(socketfd, list, flag, SHOWTIMESEATS);
 }

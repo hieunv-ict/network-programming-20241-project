@@ -5,4 +5,5 @@
 void send_all_movie(int socketfd, sqlite3* db);
 void send_cinema_list(int socketfd, sqlite3* db, char* movie_id);
 void send_showtime_list(int socketfd, sqlite3* db, char* movie_id, char* cinema_id);
+void send_seats(int socketfd, sqlite3* db, char* movie_id, char* cinema_id, char* showtime_id);
 #endif
