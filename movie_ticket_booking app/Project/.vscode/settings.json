@@ -5,6 +5,8 @@
         "booking.h": "c",
         "movie_function.h": "c",
         "movie_func.h": "c",
-        "sqlite3.h": "c"
+        "sqlite3.h": "c",
+        "*.tcc": "c",
+        "typeinfo": "c"
     }
 }

@@ -7,6 +7,7 @@
 #include "movie_function.h"
 
 #define MAXLINE 2048
+#define MAXSEAT 100
 //int socketfd;
 message ticket;
 
@@ -104,87 +105,18 @@ message ticket;
 //     confirmOrder();
 // }
 
-// void selectSeat()
-// {
-//     int valid, count = 0, num, select, available_seats;
-//     char status;
 
-//     for (int i = 0; i < ticket.seat.row * ticket.seat.col; i++)
-//     {
-//         status = ticket.seat.status[i] == 0 ? '-' : 'x';
-//         printf("%2d: %c\t", ticket.seat.id[i], status);
-//         count++;
-//         if (count == ticket.seat.col)
-//         {
-//             count = 0;
-//             printf("\n");
-//         }
-//     }
-//     available_seats = countAvailableSeats(ticket.seat.status, ticket.seat.row * ticket.seat.col);
-//     do
-//     {
-//         printf("Please enter number of seat you want to book: ");
-//         scanf("%d", &num);
-        
-//         if (num <= 0 || num > available_seats)
-//         {
-//             printf("Number of seats is invalid! \n");
-//         }
-//     } while (num <= 0 || num > available_seats);
-
-//     for (int i = 0; i < num; i++)
-//     {
-//         valid = 0;
-//         do
-//         {
-//             printf("Please enter the ID of seat no.%d: ", i + 1);
-//             scanf("%d", &select);
-
-//             if ((valueInArr(select, ticket.seat.id, ticket.seat.row * ticket.seat.col) == 0) && (valueInArr(select, ticket.order.seat_id, i) == 1) &&
-//                 (ticket.seat.status[select - 1] == 0))
-//             {
-//                 ticket.order.seat_id[i] = select;
-//                 valid = 1;
-//             }
-//             else
-//             {
-//                 printf("ID is invalid or seat is already taken!\n");
-//             }
-//         } while (valid == 0);
-//     }
-//     printf("\n");
-
-//     ticket.order.seat_num = num;
-//     sendInt(socketfd, ticket.order.seat_num);
-//     for (int i = 0; i < ticket.order.seat_num; i++)
-//     {
-//         sendInt(socketfd, ticket.order.seat_id[i]);
-//     }
-
-//     receivePayment();
-// }
-
-// void receiveSeat()
-// {
-//     sendInt(socketfd, SEAT);
-//     ticket.seat.row = recvInt(socketfd);
-//     ticket.seat.col = recvInt(socketfd);
-
-//     for (int i = 0; i < ticket.seat.row * ticket.seat.col; i++)
-//     {
-//         ticket.seat.id[i] = recvInt(socketfd);
-//         ticket.seat.status[i] = recvInt(socketfd);
-//     }
-
-//     selectSeat();
-// }
-
-char* movie_booking;
-char* cinema_booking;
-char* showtime_booking;
+//char* ticket.order.movie;
+//char* ticket.order.cinema_id;
+//char* ticket.order.showtime_id;
+char* booking_seats[];
+int seat_count = 0;
 void select_movie_to_book(int socketfd);
 void select_cinema_to_book(int socketfd);
 void select_showtime_to_book(int socketfd);
+
+void select_seats(int socketfd, char* seat_list[]);
+void print_ticket();
 
 void parse_response(char fields[][50]){
     int index = 1;
@@ -194,7 +126,28 @@ void parse_response(char fields[][50]){
     }
 }
 
-int get_response_list(int socketfd, char* msg_fields[], int fields_cnt){
+void parse_seat(char fields[][50], char* seat_list[]){
+    int index = 1;
+    seat_count = 0;
+    char* seat_status = "Available";
+    while (strcmp(fields[index], "") != 0){
+        for (int i = 0; i < 4; i++){
+            if (strcmp(fields[index+i*2], "") != 0){
+                if (strcmp(fields[index+i*2+1], "0") != 0){
+                    seat_status = "Reserved";
+                }
+                printf("%s-%s ",fields[index+i*2], seat_status);
+                seat_list[seat_count] = fields[index+i*2];
+                
+                seat_count++;
+            } 
+        }
+        printf("\n");
+        index+=8;
+    }
+}
+
+int get_response_list(int socketfd, char* msg_fields[], int fields_cnt, char fields[][50]){
     // send message
     char* message = concatenate_strings(msg_fields, fields_cnt);
     sendStr(socketfd, message);
@@ -204,11 +157,11 @@ int get_response_list(int socketfd, char* msg_fields[], int fields_cnt){
     int response_cnt = 0;
     
     char* signal_str;
-    char fields[100][50];
+    
     if (n > 0){
         parse_message(response, fields, &response_cnt);
         signal_str = fields[0];
-        parse_response(fields);
+        //parse_response(fields);
         return get_signal_from_string(signal_str);
     }
     else{
@@ -222,14 +175,11 @@ int get_seat_map(int socketfd, char* msg_fields[], int fields_cnt){
     // get response
     char response [MAXLINE];
     int n = recvStr(socketfd, response);
-    int response_cnt = 0;
-    
     char* signal_str;
     char fields[100][50];
     if (n > 0){
         //parse_message(response, fields, &response_cnt);
         int index = 1;
-        int col_cnt = 0;
         char* seat_status = "Available";
         while (strcmp(fields[index], "") != 0){
             if (strcmp(fields[index+1], "0") != 0){
@@ -277,12 +227,14 @@ void select_movie_to_book(int socketfd){
     scanf("%d", &tmp);
     char movie_id[10];
     sprintf(movie_id, "%d", tmp);
-    movie_booking = movie_id;
+    strcpy(ticket.order.movie_id, movie_id);
     char* signal = get_string_from_signal(MOVIE);
-    char* msg_fields[2] = {signal, movie_booking};
-    int signal_res = get_response_list(socketfd, msg_fields, 2);
+    char* msg_fields[2] = {signal, ticket.order.movie_id};
+    char result[100][50];
+    int signal_res = get_response_list(socketfd, msg_fields, 2, result);
     if (signal_res == MOVIECINEMA){
         printf("Select a cinema. \n");
+        parse_response(result);
         select_cinema_to_book(socketfd);
     }
     else{
@@ -294,16 +246,18 @@ void select_cinema_to_book(int socketfd){
     printf("Enter cinema id: ");
     char cinema_id[10];
     scanf("%s", cinema_id);
-    cinema_booking = cinema_id;
+    strcpy(ticket.order.cinema_id,cinema_id);
     char* signal = get_string_from_signal(CINEMA);
-    char* msg_fields[3] = {signal, movie_booking, cinema_booking};
-    int signal_res= get_response_list(socketfd, msg_fields, 3);
+    char* msg_fields[3] = {signal, ticket.order.movie_id, ticket.order.cinema_id};
+    char result[100][50];
+    int signal_res= get_response_list(socketfd, msg_fields, 3, result);
     if (signal_res == CINEMASHOWTIME){
         printf("Select a showtime: \n");
+        parse_response(result);
         select_showtime_to_book(socketfd);
     }
     else{
-        printf("The movie has no showtime. \n");
+        printf("The cinema you chose has no showtime. \n");
     }
 }
 
@@ -311,25 +265,128 @@ void select_showtime_to_book(int socketfd){
     printf("Enter showtime id: ");
     char showtime_id[20];
     scanf("%s", showtime_id);
-    showtime_booking = showtime_id;
+    strcpy(ticket.order.showtime_id,showtime_id);
     char* signal = get_string_from_signal(SHOWTIME);
-    char* msg_fields[4] = {signal, movie_booking, cinema_booking, showtime_booking};
-    printf("Seat map: \n");
-    int signal_res= get_seat_map(socketfd, msg_fields, 4);
+    char* msg_fields[4] = {signal, ticket.order.movie_id, ticket.order.cinema_id, ticket.order.showtime_id};
+    char result[100][50];
+    int signal_res = get_response_list(socketfd, msg_fields, 4, result);
+    
     if (signal_res == SHOWTIMESEATS){
         
+        char* seat_list[MAXSEAT];
+        parse_seat(result, seat_list);
+        printf("There are %i seats \n", seat_count);
+        select_seats(socketfd, seat_list);
     }
     else{
         printf("The movie is not screened in any theatre. \n");
     }
 }
 
-void select_seats(int socketfd){
-    printf("Enter number of seats: ");
-    int seat_num = 0;
-    scanf("%d", &seat_num);
+int check_valid_seat(char* input, char* seat_list[]){
+    
+    for (int i = 0; i < seat_count; i++){
+        //printf("%s ", seat_list[i]);
+        if (seat_list[i] == NULL){
+            continue;
+        }
+        if (strcmp(seat_list[i], input) == 0){
+            return 1;
+        }
 
+    }
+
+    for (int i = 0; i < ticket.order.seat_num; i++){
+        if (ticket.order.seat_id[i] == NULL){
+            continue;
+        }
+        if (strcmp(input, ticket.order.seat_id[i]) == 0){
+            printf("Duplicate seat \n");
+            return 0;
+        }
+        else{
+            if (i == ticket.order.seat_num-1){
+                return 1;
+            }
+        }
+    }
+    printf("Invalid seat \n");
+    return 0;
+}
+void select_seats(int socketfd, char* seat_list[]){
+    
+    char num_tmp[5];
+    int seat_num = 0;
+    do{
+        printf("Enter number of seats: ");
+        scanf("%s", num_tmp);
+        seat_num = atoi(num_tmp);
+        
+    }while (seat_num <= 0 || seat_num > seat_count);
+    ticket.order.seat_num = seat_num;
+
+    char seat_tmp[10];
+    for (int i = 0; i < seat_num; i++){
+        do{
+            printf("Select seat for ticket %i: ", i+1);
+            scanf("%s", seat_tmp);
+        }while (check_valid_seat(seat_tmp, seat_list) == 0);
+        ticket.order.seat_id[i] = seat_tmp;
+        
+    }
+
+    for (int i = 0; i < ticket.order.seat_num; i++)
+    {
+        printf(" %s\n", ticket.order.seat_id[i]);
+    }
 }
 
+// send all information about booking and get price of the booking 
+void send_booking_info(int socketfd){
+    char* signal = get_string_from_signal(BOOKINFO);
+    int cnt = 4 + ticket.order.seat_num;
+    char* msg_fields[] = {signal, ticket.order.movie_id, ticket.order.cinema_id, ticket.order.showtime_id};
+    for (int i = 4; i < cnt; i++){
+        msg_fields[i] = ticket.order.seat_id[i-4];
+    }
+    char result[100][50];
+    int signal_res = get_response_list(socketfd, msg_fields, cnt, result);
+    
+    if (signal_res == PRICE){
+        parse_response(result);
+        
+    }
+    else{
+        printf("Your booking is not successful. \n");
+    }
+}
+
+void print_ticket()
+{
+    printf("\n----------------------------\n");
+    printf("\tBooking info\n");
+    printf("----------------------------\n");
+    printf("Username\n");
+    printf("%s\n", ticket.order.movie_id);
+    printf("%s\n", ticket.order.cinema_id);
+    printf("%s\n", ticket.order.showtime_id);
+    printf("Seat(s):");
+    
+    for (int i = 0; i < ticket.order.seat_num; i++)
+    {
+        printf(" %s\n", ticket.order.seat_id[i]);
+    }
+    printf("\n");
+    //printf("Total price: %d VND\n", ticket.order.total);
+
+    //printf("\n%s\n", ticket.order.pay);
+    //if (strcmp(ticket.order.pay, "Thanh toan online") == 0)
+    //{
+    //    printf("Card Number: %s\n", ticket.order.card);
+    //    printf("Date expire: %s\n", ticket.order.valid_date);
+    //    printf("CCV: %d\n", ticket.order.ccv);
+    //}
+    printf("----------------------------\n");
+}
 
 

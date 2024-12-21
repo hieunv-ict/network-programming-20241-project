@@ -4,17 +4,17 @@ typedef struct order
 {
     char uname[100];
 
-    int movie_id;
-    char movie[20];
+    char movie_id[8];
+    char movie[64];
 
-    int cinema_id;
-    char cinema[20];
+    char cinema_id[8];
+    char cinema[64];
 
-    int time_id;
-    char time[20];
+    char showtime_id[8];
+    char showtime[64];
 
     int seat_num;
-    int seat_id[10];
+    char* seat_id[100];
 
     int total;
     char pay[50];

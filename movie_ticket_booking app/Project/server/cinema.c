@@ -107,7 +107,7 @@ int booking_response(sqlite3* db, const char* filter[] ,int filter_cnt, const ch
         }
         
     }
-    printf("Response: %s \n", list);
+    
     if (cnt == 0) return 0;
     else return 1;
 }
@@ -124,10 +124,11 @@ void response_booking_info(int socketfd, char list[], int flag, int sig){
         
         int msg_len = 2;
         char* message = concatenate_strings(datafields, msg_len);
+        printf("Message: %s\n", message);
         sendStr(socketfd, message);
     }
     else{
-        printf("No cinema is send \n");
+        printf("No value is send \n");
         char* signal = get_string_from_signal(sig+1);
         sendStr(socketfd, signal);
     }
@@ -188,4 +189,8 @@ void send_seats(int socketfd, sqlite3* db, char* movie_id, char* cinema_id, char
     const char* filter[3] = {movie_id, cinema_id, showtime_id};
     int flag = booking_response(db, filter, 3, get_seats, list);
     response_booking_info(socketfd, list, flag, SHOWTIMESEATS);
+}
+
+void send_price(int socketfd, sqlite3* db, char* movie_id, char* cinema_id, char* showtime_id, char* seats[]){
+    
 }

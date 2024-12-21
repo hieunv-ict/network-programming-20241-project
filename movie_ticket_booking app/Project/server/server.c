@@ -190,33 +190,36 @@ int main(int argc, char **argv)
                     printf("\n[+]%s:%d - Request MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
                     send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
                     break;
-
-                case TIME:
-                    printf("\n[+]%s:%d - Request TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    sendListTimes(connfd);
-                    ticket.time_id = recvInt(connfd);
-                    recvStr(connfd, ticket.time);
-                    printf("[+]%s:%d - Sent TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    printf("[+]%s:%d - Choose time: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.time);
+                case BOOKINFO:
+                    printf("\n[+]%s:%d - Request BOOKING SEAT MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
+                    printf("Datafields length: %ld \n", sizeof(datafields)/sizeof(datafields[0]));
                     break;
+                // case TIME:
+                //     printf("\n[+]%s:%d - Request TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                //     sendListTimes(connfd);
+                //     ticket.time_id = recvInt(connfd);
+                //     recvStr(connfd, ticket.time);
+                //     printf("[+]%s:%d - Sent TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                //     printf("[+]%s:%d - Choose time: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.time);
+                //     break;
 
-                case SEAT:
-                    printf("\n[+]%s:%d - Request SEAT\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    sendListSeats(connfd);
-                    printf("[+]%s:%d - Sent SEAT\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                // case SEAT:
+                //     printf("\n[+]%s:%d - Request SEAT\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                //     sendListSeats(connfd);
+                //     printf("[+]%s:%d - Sent SEAT\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
-                    ticket.seat_num = recvInt(connfd);
-                    for (int i = 0; i < ticket.seat_num; i++)
-                    {
-                        ticket.seat_id[i] = recvInt(connfd);
-                    }
-                    printf("[+]%s:%d - Choose seat(s):", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    for (int i = 0; i < ticket.seat_num; i++)
-                    {
-                        printf(" %d", ticket.seat_id[i]);
-                    }
-                    printf("\n");
-                    break;
+                //     ticket.seat_num = recvInt(connfd);
+                //     for (int i = 0; i < ticket.seat_num; i++)
+                //     {
+                //         ticket.seat_id[i] = recvInt(connfd);
+                //     }
+                //     printf("[+]%s:%d - Choose seat(s):", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                //     for (int i = 0; i < ticket.seat_num; i++)
+                //     {
+                //         printf(" %d", ticket.seat_id[i]);
+                //     }
+                //     printf("\n");
+                //     break;
 
                 case PAY:
                     printf("\n[+]%s:%d - Request PAY\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));

@@ -31,6 +31,8 @@ enum state_signal
     CINEMASHOWTIME,
     SHOWTIME,
     SHOWTIMESEATS,
+    BOOKINFO,
+    PRICE,
     TIME,
     SEAT,
     PAY,
