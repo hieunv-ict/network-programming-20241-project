@@ -25,7 +25,7 @@ sqlite3* app_db;
 // new 
 char buf[MAXLINE];
 int fieldCount;
-char datafields[100][50];
+char datafields[100][128];
 void initServer()
 {
     struct sockaddr_in servaddr;
@@ -172,7 +172,11 @@ int main(int argc, char **argv)
 
                 case BOOKING:
                     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    send_all_movie(connfd, app_db);
+                    send_cinema_list(connfd, app_db, "1");
+                    int state_tmp = recvStr(connfd, buf);
+                    parse_message(buf, datafields, &fieldCount);
+                    printf("BOOKING Cinema %s \n", datafields[1]);
+                    //send_all_movie(connfd, app_db);
                     //setFd(connfd);
                     break;
 

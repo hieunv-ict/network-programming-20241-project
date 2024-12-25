@@ -119,7 +119,7 @@ int countAvailableSeats(int id[], int size)
 }
 
 // get message and parse the message by #. The array of datafield is store in fields
-void parse_message(const char *message, char fields[][50], int *fieldCount) {
+void parse_message(const char *message, char fields[][128], int *fieldCount) {
     char *token;
     char tempMessage[200]; // Temporary storage for the message
 

@@ -13,7 +13,7 @@ int getIndex(int *arr, int num, int select);
 int countAvailableSeats(int id[], int size);
 
 // helper
-void parse_message(const char *message, char fields[][50], int *fieldCount);
+void parse_message(const char *message, char fields[][128], int *fieldCount);
 char* concatenate_strings(char **strings, int count);
 int get_array_length(char *array[]);
 char* get_string_from_signal(enum state_signal i);

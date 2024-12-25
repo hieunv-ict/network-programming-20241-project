@@ -9,9 +9,9 @@
 int fieldCount;
 
 
-void parse_movie_list(char datafields[][50]);
+void parse_movie_list(char datafields[][128]);
 int search_movie_by_title(int socketfd){
-    char datafields[100][50];
+    char datafields[100][128];
     char title[128];
     printf("Enter movie title: ");
     scanf("\n%[^\n]", title);
@@ -34,7 +34,7 @@ int search_movie_by_title(int socketfd){
     else return -1;
 }
 
-void parse_movie_list(char datafields[][50]){
+void parse_movie_list(char datafields[][128]){
     int index = 1;
     while (strcmp(datafields[index], "") != 0){
         printf("ID: %s - %s \n",datafields[index], datafields[index+1]);
@@ -92,7 +92,7 @@ int browse_movie(int socketfd, int category){
     char response[MAXLINE];
     recvStr(socketfd, response);
     // printf("%s \n", response);
-    char datafields[100][50];
+    char datafields[100][128];
     parse_message(response, datafields, &fieldCount);
     parse_movie_list(datafields);
 
