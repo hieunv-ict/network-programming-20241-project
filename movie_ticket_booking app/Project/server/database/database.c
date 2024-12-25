@@ -106,7 +106,9 @@ sqlite3* initializeDatabase() {
     "CREATE TABLE IF NOT EXISTS Booking("
         "Booking_id INTEGER PRIMARY KEY,"
         "Showtime_id TEXT,"
+        "user_id TEXT, "
         "Fee REAL,"
+        "FOREIGN KEY (User_id) REFERENCES users(id)"
         "FOREIGN KEY (Showtime_id) REFERENCES Showtime(Showtime_id)"
         ");";
 

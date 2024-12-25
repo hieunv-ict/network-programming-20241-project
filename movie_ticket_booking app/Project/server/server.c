@@ -194,9 +194,9 @@ int main(int argc, char **argv)
                     printf("\n[+]%s:%d - Request MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
                     send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
                     break;
-                case BOOKINFO:
-                    printf("\n[+]%s:%d - Request BOOKING SEAT MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
-                    printf("Datafields length: %ld \n", sizeof(datafields)/sizeof(datafields[0]));
+                case PRICE:
+                    printf("\n[+]%s:%d - Request PRICE MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
+                    printf("Number of seats: %s \n", datafields[4]);
                     break;
                 // case TIME:
                 //     printf("\n[+]%s:%d - Request TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
