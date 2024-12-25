@@ -174,7 +174,7 @@ int get_array_length(char *array[]) {
 // convert enum to string
 char* signal_string[] = {"LOGIN", "SIGNUP", "USERNOTFOUND", "SEARCH", "SEARCHFOUND", "SEARCHNOTFOUND", "BROWSE", "BROWSEFOUND", "BROWSENOTFOUND",  "SUCCESS",
     "FAILURE", "BOOKING", "MOVIELIST", "NOMOVIE", "MOVIE", "MOVIECINEMA", "NOMOVIECINEMA", "CINEMA", "CINEMASHOWTIME", "SHOWTIME", "SHOWTIMESEATS", "BOOKINFO", "PRICE",
-    "TIME", "SEAT", "PAY", "CONFIRM", "USERNOTFOUND"};
+    "TIME", "SEAT", "PAY", "CONFIRM", "USERNOTFOUND", "LISTALLMOVIES", "GETUSERROLE"};
 char* get_string_from_signal(enum state_signal i){
     return signal_string[i];
 }

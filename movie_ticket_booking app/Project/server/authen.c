@@ -6,12 +6,12 @@
 #define MAXLINE 4096
 
 
-int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
+int sign_up(sqlite3 *db, int socketfd, char username[], char password[], char role[]) {
     char *errMsg = 0;
-    char sql[256];
+    char sql[256]; 
     // printf("Sign up: %s %s", username, password);
     // Insert the user into the database
-    snprintf(sql, sizeof(sql), "INSERT INTO users (username, password) VALUES ('%s', '%s');", username, password);
+    snprintf(sql, sizeof(sql), "INSERT INTO users (username, password, role) VALUES ('%s', '%s', '%s');", username, password, role);
 
     if (sqlite3_exec(db, sql, 0, 0, &errMsg) != SQLITE_OK) {
         if (strstr(errMsg, "UNIQUE constraint failed")) {
@@ -23,13 +23,13 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
         sqlite3_free(errMsg);
     } else {
         return SUCCESS;
+
     }
 }
 
-int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
-    
+int log_in(sqlite3 *db, int socketfd, char username[], char password[], char role[]) {
     sqlite3_stmt *stmt;
-    const char *sql = "SELECT password FROM users WHERE username = ?;";
+    const char *sql = "SELECT password, role FROM users WHERE username = ?;";
     // Prepare SQL statement
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
@@ -42,7 +42,9 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         // printf("Username: %s \n", username);
         const char *storedPassword = (const char *)sqlite3_column_text(stmt, 0);
+        const char *storedRole = (const char *)sqlite3_column_text(stmt, 1);
         if (strcmp(storedPassword, password) == 0) {
+            strcpy(role, storedRole);
             return SUCCESS;
         } 
         else {
