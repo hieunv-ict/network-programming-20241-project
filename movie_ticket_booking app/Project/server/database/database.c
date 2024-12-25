@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
+#include "sqlite/sqlite3.h"
 #define DBNAME "users.db"
 #define QUERY_NUM 9
 // Initialize the database and create the users table if it doesn't exist
@@ -9,10 +9,12 @@ sqlite3* initializeDatabase() {
     sqlite3 *db;
     char *errMsg = 0;
     // user table
-    const char *sql = "CREATE TABLE IF NOT EXISTS users (" \
-                      "id INTEGER PRIMARY KEY AUTOINCREMENT, " \
-                      "username TEXT UNIQUE NOT NULL, " \
-                      "password TEXT NOT NULL);";
+    const char *sql = "CREATE TABLE IF NOT EXISTS users (" 
+                      "id INTEGER PRIMARY KEY AUTOINCREMENT, " 
+                      "username TEXT UNIQUE NOT NULL, " 
+                      "password TEXT NOT NULL, " 
+                      "role TEXT NOT NULL"
+                      ");";
 
     if (sqlite3_open(DBNAME, &db) != SQLITE_OK) {
         fprintf(stderr, "Could not open database: %s\n", sqlite3_errmsg(db));

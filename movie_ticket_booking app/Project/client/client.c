@@ -9,6 +9,7 @@
 #include "../lib/message.h"
 #include "authen.h"
 #include "booking.h"
+#include "salemanager.h"
 #include "movie_function.h"
 #define MAXLINE 4096   /*max text line length*/
 #define SERV_PORT 3000 /*port*/
@@ -77,9 +78,10 @@ int main(int argc, char **argv)
         switch (choice)
         {
         case 1:
+            char role[MAXLINE];
             do
             {
-                re = logIn(socketfd, uname);
+                re = logIn(socketfd, uname, role);
                 if (re == FAILURE)
                     printf("WRONG PASSWORD!\n\n");
                 else if (re == USERNOTFOUND){
@@ -87,11 +89,17 @@ int main(int argc, char **argv)
                 }
 
             } while (re != SUCCESS);
-
+            if(strlen(role) == 0) {
+                printf("Error.\n");
+                break;
+            }
             printf("\n%s login successful!\n", uname);
             
             //TODO: add feature after logging in here:
-            booking(socketfd, uname);
+            if (strcmp(role, "Ticket Buyer") == 0)
+                booking(socketfd, uname);
+            else if (strcmp(role, "Sale Manager") == 0) 
+                salemanager_menu(socketfd);
             
             break;
         case 2:
