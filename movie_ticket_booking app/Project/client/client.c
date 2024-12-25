@@ -77,18 +77,22 @@ int main(int argc, char **argv)
         switch (choice)
         {
         case 1:
+            int cancel_flag = 0;
             do
             {
                 re = logIn(socketfd, uname);
                 if (re == FAILURE)
-                    printf("WRONG PASSWORD!\n\n");
-                else if (re == USERNOTFOUND){
-                    printf("User not found! \n\n");
+                    printf("WRONG PASSWORD OR INVALID USER!\n\n");
+                else if (re == -1){
+                    // printf("User not found! \n\n");
+                    cancel_flag = 1;
+                    break;
                 }
 
             } while (re != SUCCESS);
-
-            printf("\n%s login successful!\n", uname);
+            if(cancel_flag == 0)
+                printf("\n%s login successful!\n", uname);
+            else break;
             
             //TODO: add feature after logging in here:
             booking(socketfd, uname);
@@ -97,6 +101,7 @@ int main(int argc, char **argv)
         case 2:
             do
             {
+                char* uname = (char*) malloc(20 * sizeof(char));
                 re = signup(socketfd);
                 if (re != SUCCESS)
                     printf("Signup fail!\n\n");
@@ -113,6 +118,8 @@ int main(int argc, char **argv)
                 re = search_movie_by_title(socketfd);
                 if (re != SEARCHFOUND)
                     printf("Cannot found movie\n\n");
+                else if(re == -1)
+                    break;
 
             } while (re != SEARCHFOUND);
             // print all movie with coressponding id
@@ -125,15 +132,18 @@ int main(int argc, char **argv)
                 printf("1. Movie genre \n");
                 printf("2. Cinema \n");
                 printf("3. Showtime \n");
+                printf("4. Back \n");
                 printf("Enter category: ");
                 int category = 0;
                 scanf("%d", &category);
-                if(category > 3 || category < 1) {
+                if(category > 4 || category < 1) {
                     printf("Category invalid. Try again!\n");
                     continue;
                 }
                 re = browse_movie(socketfd, category);
-                if (re != BROWSEFOUND)
+                if (re == -1) 
+                    break;
+                else if (re != BROWSEFOUND)
                     printf("There are no movie satisfying your need. \n\n");
 
             } while (re != BROWSEFOUND);

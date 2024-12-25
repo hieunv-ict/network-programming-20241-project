@@ -14,7 +14,7 @@ typedef struct order
     char showtime[64];
 
     int seat_num;
-    char* seat_id[100];
+    char seat_id[100][20];
 
     int total;
     char pay[50];

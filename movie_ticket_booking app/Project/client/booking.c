@@ -115,7 +115,7 @@ void select_movie_to_book(int socketfd);
 void select_cinema_to_book(int socketfd);
 void select_showtime_to_book(int socketfd);
 
-void select_seats(int socketfd, char* seat_list[]);
+void select_seats(int socketfd, char seat_list[][20]);
 void print_ticket();
 
 void parse_response(char fields[][50]){
@@ -313,7 +313,7 @@ int check_valid_seat(char* input, char* seat_list[]){
     printf("Invalid seat \n");
     return 0;
 }
-void select_seats(int socketfd, char* seat_list[]){
+void select_seats(int socketfd, char seat_list[][20]){
     
     char num_tmp[5];
     int seat_num = 0;
@@ -331,13 +331,14 @@ void select_seats(int socketfd, char* seat_list[]){
             printf("Select seat for ticket %i: ", i+1);
             scanf("%s", seat_tmp);
         }while (check_valid_seat(seat_tmp, seat_list) == 0);
-        ticket.order.seat_id[i] = seat_tmp;
+        // ticket.order.seat_id[i] = seat_tmp;
+        strcpy(ticket.order.seat_id[i], seat_tmp);
         
     }
 
     for (int i = 0; i < ticket.order.seat_num; i++)
     {
-        printf(" %s\n", ticket.order.seat_id[i]);
+        printf(" %s %d\n", ticket.order.seat_id[i], i);
     }
 }
 

@@ -139,8 +139,8 @@ int main(int argc, char **argv)
                         sendInt(connfd, FAILURE);
                         printf("[+]%s:%d - Log in failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
-                    else if (login_reponse == USERNOTFOUND){
-                        sendInt(connfd, USERNOTFOUND);
+                    else {
+                        sendInt(connfd, FAILURE);
                         printf("[+]%s:%d - User not found\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
                     break;

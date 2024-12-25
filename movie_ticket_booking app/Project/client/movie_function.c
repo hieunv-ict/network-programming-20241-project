@@ -83,6 +83,9 @@ int browse_movie(int socketfd, int category){
         strcpy(category_type, "Showtime");
         strcpy(category_value, showtime);
     }
+    else {
+        return -1;
+    }
 
     // send message to server
     char* datafield[] = {signal, category_type, category_value};

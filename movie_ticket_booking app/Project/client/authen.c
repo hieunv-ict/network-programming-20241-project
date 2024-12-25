@@ -13,6 +13,7 @@ int logIn(int socketfd, char *uname)
 
     printf("Account: ");
     scanf("%s", uname); 
+    if(uname[0] == '#') return -1;
     printf("Password: ");
     scanf("%s", passwd);
     // concatenate all data fields into a message with correct format
@@ -28,7 +29,7 @@ int logIn(int socketfd, char *uname)
     return state;
 }
 
-int signup(int socketfd, char* uname){
+int signup(int socketfd){
     char username[MAXLINE];
     char passwd[MAXLINE];
     int state;
@@ -38,7 +39,7 @@ int signup(int socketfd, char* uname){
     printf("Password: ");
     scanf("%s", passwd);
     // copy username
-    strcpy(uname, username);
+    // strcpy(uname, username);
     // concatenate all data fields into a message with correct format
     // convert signal of enum type to string
     char* signal = get_string_from_signal(SIGNUP);
