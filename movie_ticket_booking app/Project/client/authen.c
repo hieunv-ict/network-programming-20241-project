@@ -46,11 +46,7 @@ int signup(int socketfd){
     printf("\n1. Ticket Buyer\n2. Sale Manager\n3. Admin\nChoose a role: ");
     scanf("%d", &role_choice);
     // copy username
-<<<<<<< HEAD
-    uname = username;
-=======
     // strcpy(uname, username);
->>>>>>> main
     // concatenate all data fields into a message with correct format
     // convert signal of enum type to string
     if (role_choice==1) strcpy(role, "Ticket Buyer");
