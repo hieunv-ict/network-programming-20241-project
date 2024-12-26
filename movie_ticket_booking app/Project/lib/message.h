@@ -33,6 +33,8 @@ enum state_signal
     SHOWTIMESEATS,
     BOOKINFO,
     PRICE,
+    PRICERES,
+    BOOKRESULT,
     TIME,
     SEAT,
     PAY,
