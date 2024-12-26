@@ -25,7 +25,7 @@ sqlite3* app_db;
 // new 
 char buf[MAXLINE];
 int fieldCount;
-char datafields[100][128];
+char datafields[100][128] = {{0}};
 void initServer()
 {
     struct sockaddr_in servaddr;
@@ -114,7 +114,9 @@ int main(int argc, char **argv)
                     printf("[+]%s:%d client request: ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     puts(buf);
                 }
-                
+
+                // process request from client
+                memset(datafields, '\0', sizeof(datafields));
                 parse_message(buf, datafields, &fieldCount);
                 char* signal = datafields[0];
                 // printf("Signal: %s \n", signal);
@@ -125,21 +127,23 @@ int main(int argc, char **argv)
                     fprintf(stderr, "Could not open database: %s\n", sqlite3_errmsg(app_db));
                     return 1;
                 }
+                sqlite3_exec(app_db, "PRAGMA journal_mode = WAL;", NULL, NULL, NULL);
+                sqlite3_exec(app_db, "PRAGMA synchronous = NORMAL", NULL, NULL, NULL);
                 switch (state)
                 {
                 case LOGIN:
                     // check if the username and password matches the data in database
                     // if matches, send success response else send fail response
-                    int login_reponse = log_in(app_db, connfd, datafields[1], datafields[2]);
-                    if (login_reponse == SUCCESS){
+                    int login_response = log_in(app_db, connfd, datafields[1], datafields[2]);
+                    if (login_response == SUCCESS){
                         sendInt(connfd, SUCCESS);
                         printf("[+]%s:%d - Log in successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
-                    else if (login_reponse == FAILURE){
+                    else if (login_response == FAILURE){
                         sendInt(connfd, FAILURE);
                         printf("[+]%s:%d - Log in failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
-                    else if (login_reponse == USERNOTFOUND){
+                    else if (login_response == USERNOTFOUND){
                         sendInt(connfd, USERNOTFOUND);
                         printf("[+]%s:%d - User not found\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
@@ -170,15 +174,15 @@ int main(int argc, char **argv)
                     send_movies_browsed(app_db, connfd, datafields[1], datafields[2]);
                     break;
 
-                case BOOKING:
-                    printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    send_cinema_list(connfd, app_db, "1");
-                    int state_tmp = recvStr(connfd, buf);
-                    parse_message(buf, datafields, &fieldCount);
-                    printf("BOOKING Cinema %s \n", datafields[1]);
-                    //send_all_movie(connfd, app_db);
-                    //setFd(connfd);
-                    break;
+                // case BOOKING:
+                //     printf("\n[+]%s:%d - Request BOOKING\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                //     send_cinema_list(connfd, app_db, "1");
+                //     int state_tmp = recvStr(connfd, buf);
+                //     parse_message(buf, datafields, &fieldCount);
+                //     printf("BOOKING Cinema %s \n", datafields[1]);
+                //     //send_all_movie(connfd, app_db);
+                //     //setFd(connfd);
+                //     break;
 
                 case MOVIE:
                     printf("\n[+]%s:%d - Request MOVIE %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
@@ -195,17 +199,14 @@ int main(int argc, char **argv)
                     send_seats(connfd, app_db, datafields[1], datafields[2], datafields[3]);
                     break;
                 case PRICE:
-                    printf("\n[+]%s:%d - Request PRICE MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
+                    printf("\n[+]%s:%d - Request PRICE of MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
                     printf("Number of seats: %s \n", datafields[4]);
+                    send_booking_price(connfd, datafields[4]);
                     break;
-                // case TIME:
-                //     printf("\n[+]%s:%d - Request TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                //     sendListTimes(connfd);
-                //     ticket.time_id = recvInt(connfd);
-                //     recvStr(connfd, ticket.time);
-                //     printf("[+]%s:%d - Sent TIME\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                //     printf("[+]%s:%d - Choose time: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), ticket.time);
-                //     break;
+                case BOOKINFO:
+                    printf("\n[+]%s:%d - Request BOOKING MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
+                    send_booking_result(connfd, app_db, datafields);
+                    break;
 
                 // case SEAT:
                 //     printf("\n[+]%s:%d - Request SEAT\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));

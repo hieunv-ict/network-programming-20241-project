@@ -115,6 +115,7 @@ void select_movie_to_book(int socketfd);
 void select_cinema_to_book(int socketfd);
 void select_showtime_to_book(int socketfd);
 void send_booking_request(int socketfd);
+void send_booking_info(int socketfd);
 
 void select_seats(int socketfd, char* seat_list[], char* seat_status[]);
 void print_ticket();
@@ -159,6 +160,7 @@ void parse_seat(char fields[][128], char* seat_list[], char* seat_status[]){
 int get_response_list(int socketfd, char* msg_fields[], int fields_cnt, char fields[][128]){
     // send message
     char* message = concatenate_strings(msg_fields, fields_cnt);
+    
     sendStr(socketfd, message);
     // get response
     char response [MAXLINE];
@@ -217,6 +219,7 @@ void booking(int socketfd, char *uname)
     int choice;
     // socketfd = fd;
     // strcpy(ticket.order.uname, uname);
+    strcpy(ticket.order.username, uname);
     do
     {
         printf("\n1. Movie Booking\n");
@@ -393,8 +396,10 @@ void send_booking_request(int socketfd){
     char result[100][128];
     int signal_res = get_response_list(socketfd, msg_fields, 5, result);
     
-    if (signal_res == BOOKINFO){
+    if (signal_res == PRICERES){
+        printf("Total price: ");
         parse_response(result);
+        send_booking_info(socketfd);
         
     }
     else{
@@ -403,16 +408,17 @@ void send_booking_request(int socketfd){
 }
 // send all information about booking and get price of the booking 
 void send_booking_info(int socketfd){
-    char* signal = get_string_from_signal(PRICE);
-    int cnt = 4 + ticket.order.seat_num;
-    char* msg_fields[] = {signal, ticket.order.movie_id, ticket.order.cinema_id, ticket.order.showtime_id};
-    for (int i = 4; i < cnt; i++){
-        msg_fields[i] = ticket.order.seat_id[i-4];
+    char* signal = get_string_from_signal(BOOKINFO);
+    int cnt = 5 + ticket.order.seat_num;
+    printf("Username: %s \n", ticket.order.username);
+    char* msg_fields[] = {signal, ticket.order.username, ticket.order.movie_id, ticket.order.cinema_id, ticket.order.showtime_id};
+    for (int i = 5; i < cnt; i++){
+        msg_fields[i] = ticket.order.seat_id[i-5];
     }
     char result[100][128];
     int signal_res = get_response_list(socketfd, msg_fields, cnt, result);
     
-    if (signal_res == BOOKINFO){
+    if (signal_res == BOOKRESULT){
         parse_response(result);
         
     }
@@ -420,6 +426,10 @@ void send_booking_info(int socketfd){
         printf("Your booking is not successful. \n");
     }
 }
+
+
+
+
 
 // void send_booking_info(){
 //     printf("Confirm booking. 1 for yes, 2 for no: ");

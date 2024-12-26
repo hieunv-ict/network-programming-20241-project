@@ -38,7 +38,7 @@ int signup(int socketfd, char* uname){
     printf("Password: ");
     scanf("%s", passwd);
     // copy username
-    strcpy(uname, username);
+    uname = username;
     // concatenate all data fields into a message with correct format
     // convert signal of enum type to string
     char* signal = get_string_from_signal(SIGNUP);

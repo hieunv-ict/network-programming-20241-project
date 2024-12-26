@@ -6,7 +6,10 @@
 #define MAXLINE 4096
 
 
+
+
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
+    
     char *errMsg = 0;
     char sql[256];
     // printf("Sign up: %s %s", username, password);
@@ -17,11 +20,14 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
         if (strstr(errMsg, "UNIQUE constraint failed")) {
             printf("Error: Username already exists.\n");
             return FAILURE;
-        } else {
+        } 
+        else {
             fprintf(stderr, "SQL error: %s\n", errMsg);
         }
         sqlite3_free(errMsg);
-    } else {
+    }
+
+    else {
         return SUCCESS;
     }
 }
@@ -29,6 +35,10 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[]) {
 int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
     
     sqlite3_stmt *stmt;
+    if (sqlite3_open("users.db", &db) != SQLITE_OK) {
+        fprintf(stderr, "Could not open database: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
     const char *sql = "SELECT password FROM users WHERE username = ?;";
     // Prepare SQL statement
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
@@ -53,5 +63,7 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[]) {
         printf("Username not found \n");
         return USERNOTFOUND;
     }
+    sqlite3_reset(stmt);
     sqlite3_finalize(stmt);
+    sqlite3_close(db);
 }
