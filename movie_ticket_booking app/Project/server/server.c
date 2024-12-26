@@ -148,16 +148,21 @@ int main(int argc, char **argv)
                         message = concatenate_strings(re_data, 2);
                         printf("Message: %s\n", message);
                         printf("[+]%s:%d - Log in successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                        //sendInt(connfd, SUCCESS);
                     }
                     else if (login_reponse == FAILURE){
                         strcpy(re_data[0], signal);
                         message = concatenate_strings(re_data, 1);
+                        printf("Message: %s\n", message);
                         printf("[+]%s:%d - Log in failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                        //sendInt(connfd, FAILURE);
                     }
                     else if (login_reponse == USERNOTFOUND){
                         strcpy(re_data[0], signal);
                         message = concatenate_strings(re_data, 1);
+                        printf("Message: %s\n", message);
                         printf("[+]%s:%d - User not found\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                        //sendInt(connfd, USERNOTFOUND);
                     }
                     sendStr(connfd, message);
                     break;

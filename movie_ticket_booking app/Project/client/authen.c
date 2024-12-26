@@ -40,9 +40,9 @@ int signup(int socketfd){
     int state;
 
     printf("Account: ");
-    scanf("%s", username);
+    scanf("\n%[^\n]", username);
     printf("Password: ");
-    scanf("%s", passwd);
+    scanf("\n%[^\n]", passwd);
     printf("\n1. Ticket Buyer\n2. Sale Manager\n3. Admin\nChoose a role: ");
     scanf("%d", &role_choice);
     // copy username

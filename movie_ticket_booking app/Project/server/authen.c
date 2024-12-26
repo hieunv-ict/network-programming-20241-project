@@ -20,6 +20,7 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[], char ro
         } 
         else {
             fprintf(stderr, "SQL error: %s\n", errMsg);
+            return FAILURE;
         }
         sqlite3_free(errMsg);
     }
