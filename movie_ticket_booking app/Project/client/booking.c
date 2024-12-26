@@ -163,7 +163,7 @@ int get_response_list(int socketfd, char* msg_fields[], int fields_cnt, char fie
     
     sendStr(socketfd, message);
     // get response
-    char response [MAXLINE];
+    char response[MAXLINE];
     int n = recvStr(socketfd, response);
     int response_cnt = 0;
     

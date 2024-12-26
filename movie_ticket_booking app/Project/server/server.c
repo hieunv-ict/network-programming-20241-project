@@ -134,24 +134,37 @@ int main(int argc, char **argv)
                 case LOGIN:
                     // check if the username and password matches the data in database
                     // if matches, send success response else send fail response
-                    int login_response = log_in(app_db, connfd, datafields[1], datafields[2]);
-                    if (login_response == SUCCESS){
-                        sendInt(connfd, SUCCESS);
+                    char* re_data[2];
+                    re_data[0] = (char*)malloc(sizeof(char) * 128);
+                    re_data[1] = (char*)malloc(sizeof(char) * MAXLINE);
+                    char role[20];
+                    char* message = (char*) malloc(sizeof(char) * MAXLINE);
+                    int login_reponse = log_in(app_db, connfd, datafields[1], datafields[2], role);
+                    char* signal = get_string_from_signal(login_reponse);
+                    if (login_reponse == SUCCESS){
+                        // sendInt(connfd, SUCCESS);
+                        strcpy(re_data[0], signal);
+                        strcpy(re_data[1], role);
+                        message = concatenate_strings(re_data, 2);
+                        printf("Message: %s\n", message);
                         printf("[+]%s:%d - Log in successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
-                    else if (login_response == FAILURE){
-                        sendInt(connfd, FAILURE);
+                    else if (login_reponse == FAILURE){
+                        strcpy(re_data[0], signal);
+                        message = concatenate_strings(re_data, 1);
                         printf("[+]%s:%d - Log in failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
-                    else if (login_response == USERNOTFOUND){
-                        sendInt(connfd, USERNOTFOUND);
+                    else if (login_reponse == USERNOTFOUND){
+                        strcpy(re_data[0], signal);
+                        message = concatenate_strings(re_data, 1);
                         printf("[+]%s:%d - User not found\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     }
+                    sendStr(connfd, message);
                     break;
 
                 case SIGNUP:
                     
-                    int response = sign_up(app_db, connfd, datafields[1], datafields[2]);
+                    int response = sign_up(app_db, connfd, datafields[1], datafields[2], datafields[3]);
                     if (response == SUCCESS){
                         sendInt(connfd, SUCCESS);
                         printf("[+]%s:%d - Sign up new account successful\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));

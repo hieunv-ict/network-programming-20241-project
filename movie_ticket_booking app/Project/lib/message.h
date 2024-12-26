@@ -39,7 +39,9 @@ enum state_signal
     SEAT,
     PAY,
     CONFIRM,
-    USERNOTFOUND
+    USERNOTFOUND, 
+    LISTALLMOVIES,
+    GETUSERROLE
 };
 
 
