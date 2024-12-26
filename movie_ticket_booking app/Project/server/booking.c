@@ -7,6 +7,7 @@
 #include "movie_func.h"
 #include "database/sqlite/sqlite3.h"
 #define DBNAME "users.db"
+
 // booking:
 // receive movie id from client
 // send available cinema

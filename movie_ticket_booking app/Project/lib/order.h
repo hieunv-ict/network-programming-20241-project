@@ -2,7 +2,7 @@
 #define ORDER_H
 typedef struct order
 {
-    char uname[100];
+    char username[100];
 
     char movie_id[8];
     char movie[64];

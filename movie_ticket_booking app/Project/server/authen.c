@@ -17,11 +17,14 @@ int sign_up(sqlite3 *db, int socketfd, char username[], char password[], char ro
         if (strstr(errMsg, "UNIQUE constraint failed")) {
             printf("Error: Username already exists.\n");
             return FAILURE;
-        } else {
+        } 
+        else {
             fprintf(stderr, "SQL error: %s\n", errMsg);
         }
         sqlite3_free(errMsg);
-    } else {
+    }
+
+    else {
         return SUCCESS;
 
     }
@@ -55,5 +58,7 @@ int log_in(sqlite3 *db, int socketfd, char username[], char password[], char rol
         printf("Username not found \n");
         return USERNOTFOUND;
     }
+    sqlite3_reset(stmt);
     sqlite3_finalize(stmt);
+    sqlite3_close(db);
 }

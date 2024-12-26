@@ -133,7 +133,7 @@ void parse_message(const char *message, char fields[][128], int *fieldCount) {
     token = strtok(tempMessage, DELIMITER);
     while (token != NULL && *fieldCount < MAX_FIELDS) {
         strncpy(fields[*fieldCount], token, 50);
-        fields[*fieldCount][49] = '\0'; // Ensure null termination
+        fields[*fieldCount][127] = '\0'; // Ensure null termination
         (*fieldCount)++;
         token = strtok(NULL, DELIMITER);
     }
@@ -173,7 +173,7 @@ int get_array_length(char *array[]) {
 
 // convert enum to string
 char* signal_string[] = {"LOGIN", "SIGNUP", "USERNOTFOUND", "SEARCH", "SEARCHFOUND", "SEARCHNOTFOUND", "BROWSE", "BROWSEFOUND", "BROWSENOTFOUND",  "SUCCESS",
-    "FAILURE", "BOOKING", "MOVIELIST", "NOMOVIE", "MOVIE", "MOVIECINEMA", "NOMOVIECINEMA", "CINEMA", "CINEMASHOWTIME", "SHOWTIME", "SHOWTIMESEATS", "BOOKINFO", "PRICE",
+    "FAILURE", "BOOKING", "MOVIELIST", "NOMOVIE", "MOVIE", "MOVIECINEMA", "NOMOVIECINEMA", "CINEMA", "CINEMASHOWTIME", "SHOWTIME", "SHOWTIMESEATS", "BOOKINFO", "PRICE", "PRICERES", "BOOKRESULT",
     "TIME", "SEAT", "PAY", "CONFIRM", "USERNOTFOUND", "LISTALLMOVIES", "GETUSERROLE"};
 char* get_string_from_signal(enum state_signal i){
     return signal_string[i];
