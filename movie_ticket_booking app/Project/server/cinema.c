@@ -212,19 +212,6 @@ int send_booking_result(int socketfd, sqlite3 *db, char datafields[][128]){
     // char sql[256];
     // // printf("Sign up: %s %s", username, password);
     // // Insert the user into the database
-    
-    // snprintf(sql, sizeof(sql), "INSERT INTO Director (Name) VALUES ('%s');", "Sam Raimi");
-
-    // if (sqlite3_exec(db, sql, 0, 0, &errMsg) != SQLITE_OK) {
-    //     if (strstr(errMsg, "UNIQUE constraint failed")) {
-    //         printf("Error: Username already exists.\n");
-            
-    //     } 
-    //     else {
-    //         fprintf(stderr, "SQL error: %s\n", errMsg);
-    //     }
-    //     sqlite3_free(errMsg);
-    // }
 
     // get movie_title
     const char* get_movie =
@@ -257,13 +244,36 @@ int send_booking_result(int socketfd, sqlite3 *db, char datafields[][128]){
     char str_price[16];
     sprintf(str_price, "%d", price);
     char* temp = str_price;
-    // insert new record into booking table
 
+    // insert new record into booking table
     const char* insert_booking = "INSERT INTO Booking (Showtime_id, user_id, Fee) VALUES (?, ?, ?);";
     char* booking_value[3] = {showtime_id, user_id, temp};
     insert_record(db, insert_booking, booking_value, 3); 
+    // insert new booking seats
+    const char* get_booking = "SELECT Booking_id, Showtime_id FROM Booking WHERE Showtime_id = ? AND user_id = ?;";
+    const char* filter2[2] = {showtime_id, user_id};
+    cnt = select_cinema(db, get_booking, filter2, 2, data);
+    char* booking_id = data[cnt-1][0];
 
-    
+    // update seat status
+    const char* get_theatre = 
+    "SELECT Theatre.Theatre_id, Theatre.Theatre_name FROM Theatre "
+    "INNER JOIN "
+    "Showtime ON Theatre.Theatre_id = Showtime.Theatre_id "
+    "WHERE Showtime.Showtime_id = ?;";
+    const char* filter3[1] = {showtime_id};
+    cnt = select_cinema(db, get_theatre, filter3, 1, data);
+    char* theatre_id = data[cnt-1][0];
+
+    const char* update_seat = 
+    "UPDATE SeatTheatre "
+    "SET Status = 1 "
+    "WHERE Seat_id = ? AND Theatre_id = ?;";
+    for (int i = 0; i < seat_cnt; i++){
+        char* seat_theatre_value[2] = {datafields[5+i], theatre_id};
+        insert_record(db, update_seat, seat_theatre_value, 2);
+        sendStr(socketfd, get_string_from_signal(SUCCESS));
+    }
 
 }
 

@@ -145,6 +145,9 @@ void parse_seat(char fields[][128], char* seat_list[], char* seat_status[]){
                 if (strcmp(fields[index+i*2+1], "0") != 0){
                     status = "Reserved";
                 }
+                else{
+                    status = "Available";
+                }
                 printf("%s-%s ",fields[index+i*2], status);
                 seat_list[seat_count] = fields[index+i*2];
                 seat_status[seat_count] = status;
@@ -193,12 +196,13 @@ int get_seat_map(int socketfd, char* msg_fields[], int fields_cnt){
     if (n > 0){
         //parse_message(response, fields, &response_cnt);
         int index = 1;
-        char* seat_status = "Available";
+        //char* seat_status = "";
         while (strcmp(fields[index], "") != 0){
-            if (strcmp(fields[index+1], "0") != 0){
-                seat_status = "Reserved";
-            }
-            printf("%s. %s ",fields[index], seat_status);
+            // seat_status = "Available";
+            // if (strcmp(fields[index+1], "0") != 0){
+            //     seat_status = "Reserved";
+            // }
+            printf("%s. %s ",fields[index], fields[index+1]);
             if (index % 8 == 0){
                 printf("\n");
             }
@@ -399,18 +403,23 @@ void send_booking_request(int socketfd){
     if (signal_res == PRICERES){
         printf("Total price: ");
         parse_response(result);
-        send_booking_info(socketfd);
-        
+        printf("Select 1 to order the ticket, 2 to exit: ");
+        int choice = 0;
+        scanf("%d", &choice);
+        if (choice == 1){
+            send_booking_info(socketfd);
+            printf("You has order the ticket successfully \n");
+        }   
     }
-    else{
-        printf("Your booking is not successful. \n");
-    }
+    // else{
+    //     printf("Your booking is not successful. \n");
+    // }
 }
 // send all information about booking and get price of the booking 
 void send_booking_info(int socketfd){
     char* signal = get_string_from_signal(BOOKINFO);
     int cnt = 5 + ticket.order.seat_num;
-    printf("Username: %s \n", ticket.order.username);
+    
     char* msg_fields[] = {signal, ticket.order.username, ticket.order.movie_id, ticket.order.cinema_id, ticket.order.showtime_id};
     for (int i = 5; i < cnt; i++){
         msg_fields[i] = ticket.order.seat_id[i-5];
