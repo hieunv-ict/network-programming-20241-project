@@ -21,9 +21,6 @@ int insert_record(sqlite3* db, const char *query, const char *values[], int valu
     }
 
     // Begin transaction and set WAL mode
-    
-    sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL);
-    sqlite3_exec(db, "PRAGMA journal_mode = WAL;", NULL, NULL, NULL);
     // Prepare the SQL statement
     rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
@@ -52,13 +49,6 @@ int insert_record(sqlite3* db, const char *query, const char *values[], int valu
 
     // Finalize the statement
     sqlite3_finalize(stmt);
-    // Commit the transaction
-    rc = sqlite3_exec(db, "COMMIT;", NULL, NULL, NULL);
-    if (rc != SQLITE_OK) {
-    fprintf(stderr, "Commit failed: %s\n", sqlite3_errmsg(db));
-    return rc;
-    }
-    
     sqlite3_close(db);
     printf("Record inserted successfully.\n");
     return 0;
