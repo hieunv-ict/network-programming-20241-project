@@ -259,9 +259,9 @@ int send_booking_result(int socketfd, sqlite3 *db, char datafields[][128]){
     char* temp = str_price;
     // insert new record into booking table
 
-    // const char* insert_booking = "INSERT INTO Booking (Showtime_id, user_id, Fee) VALUES ('%s', '%s', '%d');";
-    // char* booking_value[3] = {showtime_id, user_id, temp};
-    // insert_record(db, insert_booking, booking_value, 3); 
+    const char* insert_booking = "INSERT INTO Booking (Showtime_id, user_id, Fee) VALUES (?, ?, ?);";
+    char* booking_value[3] = {showtime_id, user_id, temp};
+    insert_record(db, insert_booking, booking_value, 3); 
 
     
 
