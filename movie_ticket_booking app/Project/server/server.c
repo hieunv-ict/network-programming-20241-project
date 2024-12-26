@@ -129,6 +129,7 @@ int main(int argc, char **argv)
                 }
                 sqlite3_exec(app_db, "PRAGMA journal_mode = WAL;", NULL, NULL, NULL);
                 sqlite3_exec(app_db, "PRAGMA synchronous = NORMAL", NULL, NULL, NULL);
+                printf("State: %s \n", get_string_from_signal(state));
                 switch (state)
                 {
                 case LOGIN:
