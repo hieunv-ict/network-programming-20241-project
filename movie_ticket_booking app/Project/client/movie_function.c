@@ -93,6 +93,7 @@ int browse_movie(int socketfd, int category){
     recvStr(socketfd, response);
     // printf("%s \n", response);
     char datafields[100][128];
+    memset(datafields, '\0', sizeof(datafields));
     parse_message(response, datafields, &fieldCount);
     parse_movie_list(datafields);
 
