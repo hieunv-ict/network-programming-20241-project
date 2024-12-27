@@ -162,7 +162,7 @@ void parse_seat(char fields[][128], char* seat_list[], char* seat_status[]){
 // get the response from server and tell if the response is good
 int get_response_list(int socketfd, char* msg_fields[], int fields_cnt, char fields[][128]){
     // send message
-    char* message = concatenate_strings(msg_fields, fields_cnt);
+    char* message = concatenate_strings(msg_fields, fields_cnt); 
     
     sendStr(socketfd, message);
     // get response

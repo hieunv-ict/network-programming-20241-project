@@ -3,7 +3,7 @@
 #include "../lib/message.h"
 #include "../lib/function.h"
 #include "database/sqlite/sqlite3.h"
-#define MAXLINE 4096
+#define MAXLINE 4096 
 
 
 int sign_up(sqlite3 *db, int socketfd, char username[], char password[], char role[]) {

@@ -10,6 +10,7 @@
 #include "authen.h"
 #include "cinema.h"
 #include "booking.h"
+#include "salemanager.h"
 #include "movie_func.h"
 #include "admin_func.h"
 #include "../lib/message.h"
@@ -120,7 +121,7 @@ int main(int argc, char **argv)
                 memset(datafields, '\0', sizeof(datafields));
                 parse_message(buf, datafields, &fieldCount);
                 char* signal = datafields[0];
-                // printf("Signal: %s \n", signal);
+                // printf("Signal: %s \n", signal); 
                 // state = ntohl(state);
                 state = get_signal_from_string(signal);
                 // open database
@@ -279,6 +280,28 @@ int main(int argc, char **argv)
                 case CONFIRM:
                     printf("\n[+]%s:%d - Order Confirm\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
                     confirmOrder();
+                    break;
+
+                case ADD:
+                    printf("\n[+]%s:%d - Request to add new movies\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    int state = add_new_movie(connfd, app_db, datafields[1], datafields[2], datafields[3], datafields[4]);
+                    // char* re_data[2];
+                    re_data[0] = (char*)malloc(sizeof(char) * 128);
+                    re_data[1] = (char*)malloc(sizeof(char) * MAXLINE);
+                    signal = get_string_from_signal(ADDRES);
+                    strcpy(re_data[0], signal);
+                    
+                    if (state == SUCCESS) {
+                        printf("\n[+]%s:%d - Add success\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                        strcpy(re_data[1], "1");
+                    }
+                    else if (state == FAILURE) {
+                        printf("\n[+]%s:%d - Add operation failed\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));             
+                        strcpy(re_data[1], "0");
+                    }
+
+                    message = concatenate_strings(re_data, 2);
+                    sendStr(connfd, message);
                     break;
 
                 default:

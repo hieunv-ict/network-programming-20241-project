@@ -6,8 +6,8 @@ DB = database
 DBLIB = database/sqlite
 all: server
 
-server: server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o
-	${CC} server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o -o server
+server: server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o salemanager.o
+	${CC} server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o salemanager.o -o server
 
 booking.o: booking.c
 	${CC} ${CFLAGS} booking.c
@@ -38,6 +38,9 @@ database.o: ${DB}/database.c
 
 sqlite3.o: ${DBLIB}/sqlite3.c
 	${CC} ${CFLAGS} ${DBLIB}/sqlite3.c
+
+salemanager.o: salemanager.c 
+	${CC} ${CFLAGS} salemanager.c
 
 clean:
 	rm -f *.o *~
