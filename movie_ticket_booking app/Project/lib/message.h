@@ -43,6 +43,8 @@ enum state_signal
     LISTALLMOVIES,
     GETUSERROLE,
     CHANGEROLE,
+    ADD,
+    ADDRES
 };
 
 

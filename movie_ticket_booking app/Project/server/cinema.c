@@ -8,7 +8,7 @@
 #include "database/sqlite/sqlite3.h"
 #define DBNAME "users.db"
 #define MAXLINE 2048
-#define TICKETPRICE 100000
+#define TICKETPRICE 100000 
 #define VALUELEN 128
 // booking:
 // receive movie id from client
