@@ -38,13 +38,13 @@ int select_movie(sqlite3* db, const char* query, const char* filter, char* (movi
         sqlite3_close(db);
         return 0;
     }
-    printf("Filter: %s \n", filter);
+    //printf("Filter: %s \n", filter);
     sqlite3_bind_text(stmt, 1, filter, -1, SQLITE_STATIC);
 
     
     while ((rc=sqlite3_step(stmt)) == SQLITE_ROW) {
         int movie_id = sqlite3_column_int(stmt, 0);
-        printf("Filter: %s \n", filter);
+        //printf("Filter: %s \n", filter);
         int director_id = sqlite3_column_int(stmt, 1);
         const unsigned char *title = sqlite3_column_text(stmt, 2);
         const char *category = (const char*)sqlite3_column_text(stmt, 3);
@@ -163,9 +163,99 @@ void send_movies_browsed(sqlite3* db, int socketfd, char* category, char* value)
 }
 
 
-// void browse_movie(sqlite3* db, int socketfd, char* category, char* value){
-//     if (strcmp(category, "Genre") == 0){
-//         select_movie_by_category(db, value);
-//     }
 
-// }
+int select_movie2(sqlite3* db, const char* query, const char* filter, char* (movie_data)[][5]){
+    flag = 0;
+    int cnt = 0;
+    sqlite3_stmt *stmt;
+    int rc;
+    
+    rc = sqlite3_open(DBNAME, &db);
+    if (rc) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        return 0;
+    }
+    rc = sqlite3_prepare_v2(db, query, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return 0;
+    }
+    //printf("Filter: %s \n", filter);
+    sqlite3_bind_text(stmt, 1, filter, -1, SQLITE_STATIC);
+
+    
+    while ((rc=sqlite3_step(stmt)) == SQLITE_ROW) {
+        int movie_id = sqlite3_column_int(stmt, 0);
+        //printf("Filter: %s \n", filter);
+        const unsigned char* title = sqlite3_column_text(stmt, 1);
+        const unsigned char *director = sqlite3_column_text(stmt, 2);
+        const char *category = (const char*)sqlite3_column_text(stmt, 3);
+        int duration = sqlite3_column_int(stmt, 4);
+
+        
+        movie_data[cnt][0] = (char*)malloc(sizeof(char) * 32);
+        sprintf(movie_data[cnt][0], "%d", movie_id);
+        
+        
+        movie_data[cnt][1] = (char*)malloc(strlen((const char*)title) + 1);
+        movie_data[cnt][2] = (char*)malloc(strlen((const char*)director) + 1);
+        movie_data[cnt][3] = (char*)malloc(strlen((const char*)category) + 1);
+        strcpy(movie_data[cnt][1], (const char*)title);
+        strcpy(movie_data[cnt][2], (const char*)director);
+        strcpy(movie_data[cnt][3], (const char*)category);
+
+        movie_data[cnt][4] = (char*)malloc(sizeof(char) * 64);
+        sprintf(movie_data[cnt][4], "%d", duration);
+        
+        cnt++;
+        flag = 1;
+    }   
+    
+    if (cnt == 0){
+        // printf("No movie \n");
+    }
+
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Execution error: %s\n", sqlite3_errmsg(db));
+        return 0;
+    }
+    // Finalize the statement and close the database
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return cnt;
+}
+
+
+
+void view_movie_detail(sqlite3* db, int socketfd, char* id) {
+    char list[MAXLINE] = "";
+
+    // Prepare SQL query
+    const char* query = "SELECT Movie.Movie_id, Movie.Title, Director.Name, Movie.Category, Movie.Duration "
+                        "FROM Movie "
+                        "INNER JOIN Director ON Director.Director_id = Movie.Director_id "
+                        "WHERE Movie.Movie_id = ?; ";
+
+    // Execute query and fetch results
+    
+    char* movie_data[1][5];
+    int cnt = select_movie2(db, query, id, movie_data);
+    // Check if data is retrieved successfully
+    if (cnt > 0) {
+        // Construct the response string
+        for (int i = 0; i < 5; i++) {
+            if (movie_data[0][i]) {
+                strcat(list, movie_data[0][i]);
+                if (i < 4) strcat(list, "#");
+                free(movie_data[0][i]); // Free allocated memory
+            }
+        }
+    } else {
+        // Handle query failure or no result
+        strcpy(list, "Error: No movie found.");
+    }
+
+    // Send response to the client
+    response_movie_list(socketfd, SUCCESS-1, cnt, list);
+}

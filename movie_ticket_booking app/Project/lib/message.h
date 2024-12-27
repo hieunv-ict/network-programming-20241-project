@@ -43,6 +43,7 @@ enum state_signal
     LISTALLMOVIES,
     GETUSERROLE,
     CHANGEROLE,
+    DETAILS
 };
 
 

@@ -204,6 +204,10 @@ int main(int argc, char **argv)
                 //     //setFd(connfd);
                 //     break;
 
+                case DETAILS:
+                    printf("[+]%s:%d - Movie id requested: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
+                    view_movie_detail(app_db, connfd, datafields[1]);
+                    break;
                 case MOVIE:
                     printf("\n[+]%s:%d - Request MOVIE %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
                     send_cinema_list(connfd, app_db, datafields[1]);

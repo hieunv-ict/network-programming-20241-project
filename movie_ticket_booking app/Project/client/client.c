@@ -54,10 +54,11 @@ int menuAuthen()
         printf("2. Signup\n");
         printf("3. Search movies by name\n");
         printf("4. Browse movies \n");
-        printf("5. Exit\n");
+        printf("5. View movie details \n");
+        printf("6. Exit\n");
         printf("Please enter your choice: ");
         scanf("%d", &choice);
-    } while (choice < 1 || choice > 5);
+    } while (choice < 1 || choice > 6);
     return choice;
 }
 
@@ -152,6 +153,12 @@ int main(int argc, char **argv)
             break;
 
         case 5:
+            int signal = view_movie_detail(socketfd);
+            if (signal != SUCCESS){
+                printf("Movie id is invalid.");
+            }
+            break;
+        case 6:
             printf("You have exited!\n");
             exit_flag = 0;
             break;

@@ -10,6 +10,33 @@ int fieldCount;
 
 
 void parse_movie_list(char datafields[][128]);
+
+int view_movie_detail(int socketfd){
+    char datafields[100][128];
+    char id[16];
+    printf("Enter movie id: ");
+    scanf("\n%[^\n]", id);
+    char response[MAXLINE];
+    char* signal = get_string_from_signal(DETAILS);
+    char* datafield[2] = {signal, id};
+    char* message = concatenate_strings(datafield, 2);
+    sendStr(socketfd, message);
+    int n = recvStr(socketfd, response);
+    if (n > 0){
+        parse_message(response, datafields, &fieldCount);
+        char* signal = datafields[0];
+
+        printf("\n****Movie Details****\n");
+        printf("Id: %s \n",datafields[1]);
+        printf("Title: %s \n",datafields[2]);
+        printf("Director: %s \n",datafields[3]);
+        printf("Category: %s \n",datafields[4]);
+        printf("Duration: %s minutes\n",datafields[5]);
+        printf("\n*********************\n");
+
+        return get_signal_from_string(signal);
+    }
+}
 int search_movie_by_title(int socketfd){
     char datafields[100][128];
     char title[128];
