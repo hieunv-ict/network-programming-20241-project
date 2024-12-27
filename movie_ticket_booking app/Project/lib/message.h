@@ -6,7 +6,7 @@
 #include "cinema.h"
 #include "time.h"
 #include "seat.h"
-#include "pay.h"
+#include "pay.h" 
 #include "order.h"
 
 enum state_signal

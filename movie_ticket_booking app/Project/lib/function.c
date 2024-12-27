@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "message.h"
+#include "message.h" 
 #define MAXLINE 100
 #define MAX_FIELDS 100
 #define DELIMITER "#"
@@ -173,7 +173,7 @@ int get_array_length(char *array[]) {
 
 // convert enum to string
 char* signal_string[] = {"LOGIN", "SIGNUP", "SEARCH", "SEARCHFOUND", "SEARCHNOTFOUND", "BROWSE", "BROWSEFOUND", "BROWSENOTFOUND",  "SUCCESS",
-    "FAILURE", "BOOKING", "MOVIELIST", "NOMOVIE", "MOVIE", "MOVIECINEMA", "NOMOVIECINEMA", "CINEMA", "CINEMASHOWTIME", "SHOWTIME", "SHOWTIMESEATS", "BOOKINFO", "PRICE", "PRICERES", "BOOKRESULT",
+    "FAILURE", "BOOKING", "MOVIE", "MOVIELIST", "NOMOVIE", "MOVIECINEMA", "NOMOVIECINEMA", "CINEMA", "CINEMASHOWTIME", "SHOWTIME", "SHOWTIMESEATS", "BOOKINFO", "PRICE", "PRICERES", "BOOKRESULT",
     "TIME", "SEAT", "PAY", "CONFIRM", "USERNOTFOUND", "LISTALLMOVIES", "GETUSERROLE", "CHANGEROLE", "ADD", "ADDRES", "DETAILS"};
 char* get_string_from_signal(enum state_signal i){
     return signal_string[i];
