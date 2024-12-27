@@ -11,6 +11,7 @@
 #include "booking.h"
 #include "salemanager.h"
 #include "movie_function.h"
+#include "admin.h"
 #define MAXLINE 4096   /*max text line length*/
 #define SERV_PORT 3000 /*port*/
 
@@ -100,7 +101,9 @@ int main(int argc, char **argv)
                 booking(socketfd, uname);
             else if (strcmp(role, "Sale Manager") == 0) 
                 salemanager_menu(socketfd);
-            
+            else if (strcmp(role, "Admin") == 0){
+                change_user_role(socketfd);
+            }
             break;
         case 2:
             do

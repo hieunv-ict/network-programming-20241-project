@@ -11,6 +11,7 @@
 #include "cinema.h"
 #include "booking.h"
 #include "movie_func.h"
+#include "admin_func.h"
 #include "../lib/message.h"
 #include "../lib/function.h"
 #include "database/database.h"
@@ -129,7 +130,7 @@ int main(int argc, char **argv)
                 }
                 sqlite3_exec(app_db, "PRAGMA journal_mode = WAL;", NULL, NULL, NULL);
                 sqlite3_exec(app_db, "PRAGMA synchronous = NORMAL", NULL, NULL, NULL);
-                printf("State: %s \n", get_string_from_signal(state));
+                
                 switch (state)
                 {
                 case LOGIN:
@@ -225,6 +226,11 @@ int main(int argc, char **argv)
                 case BOOKINFO:
                     printf("\n[+]%s:%d - Request BOOKING MOVIE %s CINEMA %s SHOWTIME %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1], datafields[2], datafields[3]);
                     send_booking_result(connfd, app_db, datafields);
+                    break;
+
+                case CHANGEROLE:
+                    printf("\n[+]%s:%d - Change role user %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), datafields[1]);
+                    update_user_role(connfd, app_db, datafields[1], datafields[2]);
                     break;
 
                 // case SEAT:

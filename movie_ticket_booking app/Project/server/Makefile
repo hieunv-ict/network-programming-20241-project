@@ -6,8 +6,8 @@ DB = database
 DBLIB = database/sqlite
 all: server
 
-server: server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o
-	${CC} server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o -o server
+server: server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o
+	${CC} server.o booking.o authen.o function.o movie_func.o database.o sqlite3.o cinema.o database_helper.o admin_func.o -o server
 
 booking.o: booking.c
 	${CC} ${CFLAGS} booking.c
@@ -26,7 +26,10 @@ cinema.o: cinema.c
 
 database_helper.o: database_helper.c
 	${CC} ${CFLAGS} database_helper.c
-	
+
+admin_func.o: admin_func.c
+	${CC} ${CFLAGS} admin_func.c
+
 function.o: ${LIB}/function.c
 	${CC} ${CFLAGS} ${LIB}/function.c
 
