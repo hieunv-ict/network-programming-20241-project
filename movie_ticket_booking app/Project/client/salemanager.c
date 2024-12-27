@@ -19,7 +19,7 @@ void add_new_movies(int socketfd, int num_movies) {
         char* fields[] = {signal, title, category, director, duration};
         char* message = concatenate_strings(fields, 5);
         char result[100][50];
-        printf("%s message", message);
+        // printf("%s message", message);
         int re = get_response_list(socketfd, fields, 5, result);
     }
 }

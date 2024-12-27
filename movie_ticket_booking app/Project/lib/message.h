@@ -19,7 +19,7 @@ enum state_signal
     BROWSE,
     BROWSEFOUND,
     BROWSENOTFOUND,
-    SUCCESS,
+    SUCCESS, 
     FAILURE,
     BOOKING,
     MOVIE,
