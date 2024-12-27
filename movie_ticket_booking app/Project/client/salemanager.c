@@ -5,10 +5,21 @@
 #include "../lib/message.h"
 #include "../lib/function.h"
 #include "movie_function.h"
+#include "booking.h"
+#define MAXLINE 1024
 
 void add_new_movies(int socketfd, int num_movies) {
     for(int i=0; i<num_movies; i++) {
-
+        char title[MAXLINE], category[MAXLINE], director[MAXLINE], duration[MAXLINE];
+        printf("Enter title: "); scanf("\n%[^\n]", title);
+        printf("Enter category: "); scanf("\n%[^\n]", category);
+        printf("Enter director: "); scanf("\n%[^\n]", director);
+        printf("Enter duration: "); scanf("\n%[^\n]", duration);
+        char* signal = get_string_from_signal(ADD);
+        char* fields[] = {signal, title, category, director, duration};
+        char* message = concatenate_strings(fields, 5);
+        char result[100][50];
+        int re = get_response_list(socketfd, fields, 5, result);
     }
 }
 
@@ -34,6 +45,10 @@ void salemanager_menu(int socketfd) {
     } while(choice > 5 || choice < 1);
     switch(choice) {
         case 1:
+            int num_movs;
+            printf("Enter number of movies to add: "); scanf("%d", &num_movs);
+            add_new_movies(socketfd, num_movs);
+            break;
         case 2:
         case 3:
         case 4:

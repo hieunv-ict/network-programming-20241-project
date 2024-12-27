@@ -15,4 +15,5 @@ void receivePayment();
 void selectPayment();
 void confirmOrder();
 void printTicket();
+int get_response_list(int socketfd, char* msg_fields[], int fields_cnt, char fields[][128]);
 #endif

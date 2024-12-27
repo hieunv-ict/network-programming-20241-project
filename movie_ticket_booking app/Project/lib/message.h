@@ -41,7 +41,9 @@ enum state_signal
     CONFIRM,
     USERNOTFOUND, 
     LISTALLMOVIES,
-    GETUSERROLE
+    GETUSERROLE,
+    ADD,
+    ADDRES
 };
 
 
